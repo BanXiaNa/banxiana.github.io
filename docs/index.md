@@ -3,16 +3,16 @@
 layout: home
 
 hero:
-  name: "My Awesome Project"
-  text: "A VitePress Site"
-  tagline: My great project tagline
+  name: "🖖Hi~Here"
+  text: "欢迎来到我的博客🤝"
+  tagline: GOGOGO！！！出发路
   actions:
     - theme: brand
-      text: Markdown Examples
+      text: 开始探索
       link: /markdown-examples
     - theme: alt
-      text: API Examples
-      link: /api-examples
+      text: 关于我
+      link: https://github.com/BanXiaNa
 
 features:
   - title: Feature A
