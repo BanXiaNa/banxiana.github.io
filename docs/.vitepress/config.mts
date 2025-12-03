@@ -3,13 +3,13 @@ import { defineConfig } from 'vitepress'
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
   title: "XIA",
-  head: [['link', { rel: 'icon', href: '/favicon.ico' }]],
+  head: [['link', { rel: 'icon', href: "https://banxia-log.oss-cn-beijing.aliyuncs.com/public/logo.bmp" }]],
   description: "A Small Blog",
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
 
     // 左上角logo
-    logo: "/logo.png",
+    logo: "https://banxia-log.oss-cn-beijing.aliyuncs.com/public/logo.bmp",
     //本地搜索
     search: {
       provider: 'local'

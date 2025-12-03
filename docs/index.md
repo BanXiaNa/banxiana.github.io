@@ -14,7 +14,7 @@ hero:
       text: API Examples
       link: /api-examples
   image:
-    src: /logo.png
+    src: https://banxia-log.oss-cn-beijing.aliyuncs.com/public/logo.bmp
     alt: VitePress
 features:
   - icon: 🛠️
