@@ -3,19 +3,20 @@
 layout: home
 
 hero:
-  name: "My BLog"
-  text: "A Small Blog"
-  tagline: My great project tagline
+  name: "👋欢迎回来！！！"
+  text: "My Personal Tech Blog"
+  tagline: "探索……沉淀……成长！"
   actions:
     - theme: brand
-      text: Markdown Examples
+      text: 开始探索
       link: /markdown-examples
     - theme: alt
       text: API Examples
       link: /api-examples
 
 features:
-  - title: Feature A
+  - icon: 🛠️
+    title: Feature A
     details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
   - title: Feature B
     details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
