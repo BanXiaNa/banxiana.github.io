@@ -21,7 +21,7 @@ export default defineConfig({
       { text: '🏡 我的主页', link: '/' },
       { text: '📚 我的笔记',
         items: [
-            { text: 'HTML', link: '/html/html-intro' },
+            { text: 'HTML', link: '/markdown-examples' },
             { text: 'CSS', link: '/css/css-intro' },
             { text: 'JavaScript', link: '/javascript/javascript-intro' },
         ]
