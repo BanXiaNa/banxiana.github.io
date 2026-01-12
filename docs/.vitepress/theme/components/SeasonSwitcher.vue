@@ -1,13 +1,13 @@
 <template>
-  <div class="season-switcher">
-    <div class="season-dropdown" @click="toggleDropdown" ref="dropdown">
-      <span class="current-season">{{ currentSeasonIcon }} {{ currentSeasonText }}</span>
-      <svg class="dropdown-arrow" :class="{ 'open': isOpen }" viewBox="0 0 24 24" width="16" height="16">
-        <path d="M7 10l5 5 5-5z" fill="currentColor"/>
-      </svg>
+  <div class="season-switcher-float">
+    <div class="season-fab" @click="toggleDropdown" ref="dropdown">
+      <span class="current-season-icon">{{ currentSeasonIcon }}</span>
     </div>
     
     <div class="season-menu" :class="{ 'show': isOpen }">
+      <div class="season-menu-header">
+        <span class="menu-title">选择季节效果</span>
+      </div>
       <div 
         v-for="season in seasons" 
         :key="season.key"
@@ -43,11 +43,6 @@ const dropdown = ref<HTMLElement>()
 const currentSeasonIcon = computed(() => {
   const season = seasons.find(s => s.key === selectedSeason.value)
   return season?.icon || '🔄'
-})
-
-const currentSeasonText = computed(() => {
-  const season = seasons.find(s => s.key === selectedSeason.value)
-  return season?.name || '自动切换'
 })
 
 // 切换下拉菜单
@@ -95,76 +90,90 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-.season-switcher {
-  position: relative;
-  display: inline-block;
+.season-switcher-float {
+  position: fixed;
+  bottom: 80px;
+  right: 24px;
+  z-index: 2000;
 }
 
-.season-dropdown {
+.season-fab {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--vp-c-brand-1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 6px 12px;
-  background: var(--vp-c-bg-soft);
-  border: 1px solid var(--vp-c-divider);
-  border-radius: 6px;
+  justify-content: center;
   cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 14px;
-  color: var(--vp-c-text-1);
+  transition: all 0.3s ease;
   user-select: none;
+  backdrop-filter: blur(8px);
 }
 
-.season-dropdown:hover {
-  background: var(--vp-c-bg-mute);
-  border-color: var(--vp-c-brand-1);
+.season-fab:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  background: var(--vp-c-brand-2);
 }
 
-.current-season {
-  white-space: nowrap;
+.season-fab:active {
+  transform: translateY(0);
 }
 
-.dropdown-arrow {
-  transition: transform 0.2s ease;
-  color: var(--vp-c-text-2);
-}
-
-.dropdown-arrow.open {
-  transform: rotate(180deg);
+.current-season-icon {
+  font-size: 24px;
+  line-height: 1;
 }
 
 .season-menu {
   position: absolute;
-  top: 100%;
+  bottom: 70px;
   right: 0;
-  margin-top: 4px;
   background: var(--vp-c-bg-elv);
   border: 1px solid var(--vp-c-divider);
-  border-radius: 8px;
-  box-shadow: var(--vp-shadow-3);
-  min-width: 160px;
-  z-index: 1000;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  min-width: 180px;
   opacity: 0;
   visibility: hidden;
-  transform: translateY(-8px);
-  transition: all 0.2s ease;
+  transform: translateY(10px) scale(0.95);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(12px);
+  overflow: hidden;
 }
 
 .season-menu.show {
   opacity: 1;
   visibility: visible;
-  transform: translateY(0);
+  transform: translateY(0) scale(1);
+}
+
+.season-menu-header {
+  padding: 12px 16px 8px;
+  border-bottom: 1px solid var(--vp-c-divider-light);
+  background: var(--vp-c-bg-soft);
+}
+
+.menu-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--vp-c-text-2);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .season-item {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
+  gap: 12px;
+  padding: 12px 16px;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: all 0.2s ease;
   font-size: 14px;
   color: var(--vp-c-text-1);
+  position: relative;
 }
 
 .season-item:hover {
@@ -176,37 +185,83 @@ onUnmounted(() => {
   color: var(--vp-c-brand-1);
 }
 
-.season-item:first-child {
-  border-radius: 8px 8px 0 0;
-}
-
-.season-item:last-child {
-  border-radius: 0 0 8px 8px;
+.season-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--vp-c-brand-1);
 }
 
 .season-icon {
-  font-size: 16px;
+  font-size: 18px;
+  line-height: 1;
 }
 
 .season-name {
   white-space: nowrap;
+  font-weight: 500;
 }
 
 /* 响应式设计 */
 @media (max-width: 768px) {
-  .season-dropdown {
-    padding: 4px 8px;
-    font-size: 13px;
+  .season-switcher-float {
+    bottom: 70px;
+    right: 16px;
+  }
+  
+  .season-fab {
+    width: 48px;
+    height: 48px;
+  }
+  
+  .current-season-icon {
+    font-size: 20px;
   }
   
   .season-menu {
-    right: -20px;
-    min-width: 140px;
+    bottom: 60px;
+    min-width: 160px;
   }
   
   .season-item {
-    padding: 6px 10px;
+    padding: 10px 14px;
     font-size: 13px;
   }
+  
+  .season-icon {
+    font-size: 16px;
+  }
+}
+
+/* 暗色主题适配 */
+.dark .season-fab {
+  background: var(--vp-c-brand-1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.dark .season-fab:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+.dark .season-menu {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+/* 动画效果 */
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.season-fab:focus {
+  animation: pulse 1s ease-in-out;
+  outline: none;
 }
 </style>

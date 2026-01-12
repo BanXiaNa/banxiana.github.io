@@ -9,7 +9,7 @@ export default {
     
     Layout: () => {
         return h(DefaultTheme.Layout, null, {
-            'nav-bar-content-after': () => h(SeasonSwitcher)
+            'layout-bottom': () => h(SeasonSwitcher)
         })
     },
 
