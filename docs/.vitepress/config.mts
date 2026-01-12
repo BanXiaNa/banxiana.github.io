@@ -43,6 +43,13 @@ export default defineConfig({
               { text: '建造者模式', link: '/pages/DesignPattern/CreationalPattern/BuilderPattern/BuilderPattern' },
               { text: '原型模式', link: '/pages/DesignPattern/CreationalPattern/PrototypePattern/PrototypePattern' }
             ]
+          },
+          { 
+            text: '结构型模式',
+            collapsed: false,
+            items: [
+              { text: '适配器模式', link: '/pages/DesignPattern/StructuralPattern/AdapterPattern/AdapterPattern' }
+            ]
           }
         ]
       }
