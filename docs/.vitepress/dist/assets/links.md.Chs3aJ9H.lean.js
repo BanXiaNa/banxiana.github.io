@@ -1,0 +1,1 @@
+import{_ as a,c as r,o as t,aj as l}from"./chunks/framework.CSCBGoZg.js";const f=JSON.parse('{"title":"🗞 杂货","description":"","frontmatter":{},"headers":[],"relativePath":"links.md","filePath":"links.md"}'),i={name:"links.md"};function n(s,e,o,h,_,c){return t(),r("div",null,[...e[0]||(e[0]=[l("",8)])])}const p=a(i,[["render",n]]);export{f as __pageData,p as default};
