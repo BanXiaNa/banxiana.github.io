@@ -43,7 +43,7 @@
 
 ☐ 组合模式（Composite Pattern）
 
-☐ 装饰器模式（Decorator Pattern）
+☑ [装饰器模式（Decorator Pattern）](StructuralPattern/DecoratorPattern/DecoratorPattern.md)
 
 ☐ 外观模式（Facade Pattern）
 

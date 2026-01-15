@@ -48,7 +48,8 @@ export default defineConfig({
             text: '结构型模式',
             collapsed: false,
             items: [
-              { text: '适配器模式', link: '/pages/DesignPattern/StructuralPattern/AdapterPattern/AdapterPattern' }
+              { text: '适配器模式', link: '/pages/DesignPattern/StructuralPattern/AdapterPattern/AdapterPattern' },
+              { text: '装饰器模式', link: '/pages/DesignPattern/StructuralPattern/DecoratorPattern/DecoratorPattern' }
             ]
           }
         ]
