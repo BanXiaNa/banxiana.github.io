@@ -41,7 +41,7 @@
 
 ☑ [过滤器模式（Filter、Criteria Pattern）](StructuralPattern/FilterPattern/FilterPattern.md)
 
-☐ 组合模式（Composite Pattern）
+☑ [组合模式（Composite Pattern）](StructuralPattern/CompositePattern/CompositePattern.md)
 
 ☑ [装饰器模式（Decorator Pattern）](StructuralPattern/DecoratorPattern/DecoratorPattern.md)
 

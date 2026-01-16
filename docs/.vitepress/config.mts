@@ -51,6 +51,7 @@ export default defineConfig({
               { text: '适配器模式', link: '/pages/DesignPattern/StructuralPattern/AdapterPattern/AdapterPattern' },
               { text: '桥接模式', link: '/pages/DesignPattern/StructuralPattern/BridgePattern/BridgePattern' },
               { text: '过滤器模式', link: '/pages/DesignPattern/StructuralPattern/FilterPattern/FilterPattern' },
+              { text: '组合模式', link: '/pages/DesignPattern/StructuralPattern/CompositePattern/CompositePattern' },
               { text: '装饰器模式', link: '/pages/DesignPattern/StructuralPattern/DecoratorPattern/DecoratorPattern' }
             ]
           }
