@@ -37,7 +37,7 @@
 
 ☑ [适配器模式（Adapter Pattern）](StructuralPattern/AdapterPattern/AdapterPattern.md)
 
-☐ 桥接模式（Bridge Pattern）
+☑ [桥接模式（Bridge Pattern）](StructuralPattern/BridgePattern/BridgePattern.md)
 
 ☐ 过滤器模式（Filter、Criteria Pattern）
 
