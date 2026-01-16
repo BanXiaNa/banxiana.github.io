@@ -39,7 +39,7 @@
 
 ☑ [桥接模式（Bridge Pattern）](StructuralPattern/BridgePattern/BridgePattern.md)
 
-☐ 过滤器模式（Filter、Criteria Pattern）
+☑ [过滤器模式（Filter、Criteria Pattern）](StructuralPattern/FilterPattern/FilterPattern.md)
 
 ☐ 组合模式（Composite Pattern）
 
