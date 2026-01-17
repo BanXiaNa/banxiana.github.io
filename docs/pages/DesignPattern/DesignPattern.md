@@ -45,7 +45,7 @@
 
 ☑ [装饰器模式（Decorator Pattern）](StructuralPattern/DecoratorPattern/DecoratorPattern.md)
 
-☐ 外观模式（Facade Pattern）
+☑ [外观模式（Facade Pattern）](StructuralPattern/FacadePattern/FacadePattern.md)
 
 ☐ 享元模式（Flyweight Pattern）
 
