@@ -53,7 +53,8 @@ export default defineConfig({
               { text: '过滤器模式', link: '/pages/DesignPattern/StructuralPattern/FilterPattern/FilterPattern' },
               { text: '组合模式', link: '/pages/DesignPattern/StructuralPattern/CompositePattern/CompositePattern' },
               { text: '装饰器模式', link: '/pages/DesignPattern/StructuralPattern/DecoratorPattern/DecoratorPattern' },
-              { text: '外观模式', link: '/pages/DesignPattern/StructuralPattern/FacadePattern/FacadePattern' }
+              { text: '外观模式', link: '/pages/DesignPattern/StructuralPattern/FacadePattern/FacadePattern' },
+              { text: '享元模式', link: '/pages/DesignPattern/StructuralPattern/FlyweightPattern/FlyweightPattern' }
             ]
           }
         ]

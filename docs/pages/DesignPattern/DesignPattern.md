@@ -47,7 +47,7 @@
 
 ☑ [外观模式（Facade Pattern）](StructuralPattern/FacadePattern/FacadePattern.md)
 
-☐ 享元模式（Flyweight Pattern）
+☑ [享元模式（Flyweight Pattern）](StructuralPattern/FlyweightPattern/FlyweightPattern.md)
 
 ☐ 代理模式（Proxy Pattern）
 
