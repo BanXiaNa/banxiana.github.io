@@ -49,7 +49,7 @@
 
 ☑ [享元模式（Flyweight Pattern）](StructuralPattern/FlyweightPattern/FlyweightPattern.md)
 
-☐ 代理模式（Proxy Pattern）
+☑ [代理模式（Proxy Pattern）](StructuralPattern/ProxyPattern/ProxyPattern.md)
 
 ## 行为型模式
 
