@@ -55,7 +55,7 @@
 
 > 这些模式关注对象之间的通信和交互，旨在解决对象之间的责任分配和算法的封装。
 
-☐ 责任链模式（Chain of Responsibility Pattern）
+☑ [责任链模式（Chain of Responsibility Pattern）](BehavioralPattern/ChainOfResponsibilityPattern/ChainOfResponsibilityPattern.md)
 
 ☐ 命令模式（Command Pattern）
 

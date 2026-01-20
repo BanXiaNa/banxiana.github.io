@@ -57,6 +57,13 @@ export default defineConfig({
               { text: '享元模式', link: '/pages/DesignPattern/StructuralPattern/FlyweightPattern/FlyweightPattern' },
               { text: '代理模式', link: '/pages/DesignPattern/StructuralPattern/ProxyPattern/ProxyPattern' }
             ]
+          },
+          { 
+            text: '行为型模式',
+            collapsed: false,
+            items: [
+              { text: '责任链模式', link: '/pages/DesignPattern/BehavioralPattern/ChainOfResponsibilityPattern/ChainOfResponsibilityPattern' }
+            ]
           }
         ]
       }
