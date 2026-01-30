@@ -26,7 +26,11 @@ export default defineConfig({
             { text: '设计模式', link: '/pages/DesignPattern/DesignPattern' },
         ]
       },
-      { text: '🗞 杂货', link: '/links'}
+      { text: '🗞 杂货',
+        items: [
+            { text: 'Git 提交规范', link: '/pages/Groceries/GitCommitConventions' },
+        ]
+      }
     ],
 
     sidebar: [
@@ -65,6 +69,12 @@ export default defineConfig({
               { text: '责任链模式', link: '/pages/DesignPattern/BehavioralPattern/ChainOfResponsibilityPattern/ChainOfResponsibilityPattern' }
             ]
           }
+        ]
+      },
+      {
+        text: '🗞 杂货',
+        items: [
+          { text: 'Git 提交规范', link: '/pages/Groceries/GitCommitConventions' }
         ]
       }
     ],
