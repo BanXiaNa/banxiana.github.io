@@ -24,6 +24,7 @@ export default defineConfig({
       { text: '📚 我的笔记',
         items: [
             { text: '设计模式', link: '/pages/DesignPattern/DesignPattern' },
+            { text: 'MySQL 数据库', link: '/pages/Notes/MySQLNotes' },
         ]
       },
       { text: '🗞 杂货',
@@ -38,38 +39,45 @@ export default defineConfig({
       {
         text: '📚 我的笔记',
         items: [
-          { text: '设计模式总览', link: '/pages/DesignPattern/DesignPattern' },
           { 
-            text: '创建型模式',
+            text: '设计模式',
+            link: '/pages/DesignPattern/DesignPattern',
             collapsed: false,
             items: [
-              { text: '工厂模式', link: '/pages/DesignPattern/CreationalPattern/FactoryPattern/FactoryPattern' },
-              { text: '单例模式', link: '/pages/DesignPattern/CreationalPattern/SingletonPattern/SingletonPattern' },
-              { text: '建造者模式', link: '/pages/DesignPattern/CreationalPattern/BuilderPattern/BuilderPattern' },
-              { text: '原型模式', link: '/pages/DesignPattern/CreationalPattern/PrototypePattern/PrototypePattern' }
+              { 
+                text: '创建型设计模式',
+                collapsed: false,
+                items: [
+                  { text: '工厂模式', link: '/pages/DesignPattern/CreationalPattern/FactoryPattern/FactoryPattern' },
+                  { text: '单例模式', link: '/pages/DesignPattern/CreationalPattern/SingletonPattern/SingletonPattern' },
+                  { text: '建造者模式', link: '/pages/DesignPattern/CreationalPattern/BuilderPattern/BuilderPattern' },
+                  { text: '原型模式', link: '/pages/DesignPattern/CreationalPattern/PrototypePattern/PrototypePattern' }
+                ]
+              },
+              { 
+                text: '结构型设计模式',
+                collapsed: false,
+                items: [
+                  { text: '适配器模式', link: '/pages/DesignPattern/StructuralPattern/AdapterPattern/AdapterPattern' },
+                  { text: '桥接模式', link: '/pages/DesignPattern/StructuralPattern/BridgePattern/BridgePattern' },
+                  { text: '过滤器模式', link: '/pages/DesignPattern/StructuralPattern/FilterPattern/FilterPattern' },
+                  { text: '组合模式', link: '/pages/DesignPattern/StructuralPattern/CompositePattern/CompositePattern' },
+                  { text: '装饰器模式', link: '/pages/DesignPattern/StructuralPattern/DecoratorPattern/DecoratorPattern' },
+                  { text: '外观模式', link: '/pages/DesignPattern/StructuralPattern/FacadePattern/FacadePattern' },
+                  { text: '享元模式', link: '/pages/DesignPattern/StructuralPattern/FlyweightPattern/FlyweightPattern' },
+                  { text: '代理模式', link: '/pages/DesignPattern/StructuralPattern/ProxyPattern/ProxyPattern' }
+                ]
+              },
+              { 
+                text: '行为型设计模式',
+                collapsed: false,
+                items: [
+                  { text: '责任链模式', link: '/pages/DesignPattern/BehavioralPattern/ChainOfResponsibilityPattern/ChainOfResponsibilityPattern' }
+                ]
+              }
             ]
           },
-          { 
-            text: '结构型模式',
-            collapsed: false,
-            items: [
-              { text: '适配器模式', link: '/pages/DesignPattern/StructuralPattern/AdapterPattern/AdapterPattern' },
-              { text: '桥接模式', link: '/pages/DesignPattern/StructuralPattern/BridgePattern/BridgePattern' },
-              { text: '过滤器模式', link: '/pages/DesignPattern/StructuralPattern/FilterPattern/FilterPattern' },
-              { text: '组合模式', link: '/pages/DesignPattern/StructuralPattern/CompositePattern/CompositePattern' },
-              { text: '装饰器模式', link: '/pages/DesignPattern/StructuralPattern/DecoratorPattern/DecoratorPattern' },
-              { text: '外观模式', link: '/pages/DesignPattern/StructuralPattern/FacadePattern/FacadePattern' },
-              { text: '享元模式', link: '/pages/DesignPattern/StructuralPattern/FlyweightPattern/FlyweightPattern' },
-              { text: '代理模式', link: '/pages/DesignPattern/StructuralPattern/ProxyPattern/ProxyPattern' }
-            ]
-          },
-          { 
-            text: '行为型模式',
-            collapsed: false,
-            items: [
-              { text: '责任链模式', link: '/pages/DesignPattern/BehavioralPattern/ChainOfResponsibilityPattern/ChainOfResponsibilityPattern' }
-            ]
-          }
+          { text: 'MySQL 数据库', link: '/pages/Notes/MySQLNotes' }
         ]
       },
       {
