@@ -29,6 +29,7 @@ export default defineConfig({
       { text: '🗞 杂货',
         items: [
             { text: 'Git 提交规范', link: '/pages/Groceries/GitCommitConventions' },
+            { text: 'Python 基础教程', link: '/pages/Groceries/MAGAOPythonNotesS1' },
         ]
       }
     ],
@@ -74,7 +75,8 @@ export default defineConfig({
       {
         text: '🗞 杂货',
         items: [
-          { text: 'Git 提交规范', link: '/pages/Groceries/GitCommitConventions' }
+          { text: 'Git 提交规范', link: '/pages/Groceries/GitCommitConventions' },
+          { text: 'Python 基础教程', link: '/pages/Groceries/MAGAOPythonNotesS1' }
         ]
       }
     ],
