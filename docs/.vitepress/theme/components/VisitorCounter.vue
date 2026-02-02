@@ -25,8 +25,8 @@ onMounted(() => {
       if (container && valueElement) {
         // 获取原始访问量
         const originalCount = parseInt(valueElement.textContent || '0')
-        // 设置初始偏移量为 83
-        const offset = 83
+        // 设置初始偏移量为 0
+        const offset = 0
         // 更新显示的访问量
         valueElement.textContent = String(originalCount + offset)
         // 显示容器
