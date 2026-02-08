@@ -3,7 +3,7 @@ User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://banxiana.github.io/sitemap.xml
+Sitemap: https://pinellia.cn/sitemap.xml
 
 # 禁止爬取的目录（如果有的话）
 Disallow: /api/

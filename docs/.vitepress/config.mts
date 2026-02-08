@@ -25,7 +25,7 @@ export default defineConfig({
   
   // Sitemap 配置
   sitemap: {
-    hostname: 'https://banxiana.github.io'  // 你的网站域名，根据实际情况修改
+    hostname: 'https://pinellia.cn'
   },
   
   // 显示最后更新时间
