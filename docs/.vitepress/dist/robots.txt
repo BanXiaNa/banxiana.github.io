@@ -1,0 +1,10 @@
+# robots.txt for XIA's Blog
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://banxiana.github.io/sitemap.xml
+
+# 禁止爬取的目录（如果有的话）
+Disallow: /api/
+Disallow: /.vitepress/
