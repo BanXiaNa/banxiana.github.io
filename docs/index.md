@@ -9,10 +9,10 @@ hero:
   actions:
     - theme: brand
       text: 🚀 开始探索
-      link: /pages/DesignPattern/DesignPattern
+      link: /pages/Articles/DesignPattern/DesignPattern
     - theme: alt
-      text: 📐 设计模式
-      link: /pages/DesignPattern/DesignPattern
+      text: 🗄️ MySQL 文档
+      link: /pages/Documents/SQL/
   image:
     src: https://banxia-log.oss-cn-beijing.aliyuncs.com/public/logo.bmp
     alt: XIA Tech Blog
@@ -20,26 +20,26 @@ features:
   - icon: 📐
     title: 设计模式精讲
     details: 深入浅出地讲解经典设计模式，从理论到实践，提升代码质量和架构思维
-    link: /pages/DesignPattern/DesignPattern
-  - icon: 🏗️
-    title: 创建型模式
-    details: 工厂模式、单例模式、建造者模式等创建型设计模式的详细解析与代码实现
-    link: /pages/DesignPattern/DesignPattern
-  - icon: 🔧
-    title: 实践案例
-    details: 结合实际项目场景，展示设计模式在真实开发中的应用与最佳实践
-    link: /pages/DesignPattern/DesignPattern
-  - icon: 💡
-    title: 编程思想
-    details: 分享编程心得与技术感悟，探讨软件工程中的设计理念与开发哲学
-    link: /pages/DesignPattern/DesignPattern
-  - icon: 📚
-    title: 学习笔记
-    details: 系统化的技术学习笔记，涵盖前端、后端、架构设计等多个技术领域
-    link: /pages/DesignPattern/DesignPattern
+    link: /pages/Articles/DesignPattern/DesignPattern
+  - icon: 🗄️
+    title: MySQL 数据库
+    details: 从基础到进阶，系统学习 MySQL 数据库，涵盖索引、事务、锁、性能优化等核心知识
+    link: /pages/Documents/SQL/
+  - icon: 🌱
+    title: Spring 小记
+    details: Spring 框架学习笔记，记录开发中的实用技巧与最佳实践
+    link: /pages/Documents/SpringNotes/
+  - icon: 🐍
+    title: Python 基础
+    details: Python 编程基础教程，适合初学者入门学习
+    link: /pages/Groceries/MAGAOPythonNotesS1
+  - icon: 📋
+    title: Git 提交规范
+    details: 规范化的 Git 提交信息格式，提升团队协作效率
+    link: /pages/Articles/GitCommitConventions
   - icon: 🌟
     title: 持续更新
     details: 定期更新技术文章，跟上技术发展趋势，与你一起在技术路上不断前行
-    link: /pages/DesignPattern/DesignPattern
+    link: /pages/Articles/DesignPattern/DesignPattern
 ---
 
