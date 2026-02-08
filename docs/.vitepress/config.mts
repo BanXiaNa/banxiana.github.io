@@ -10,13 +10,20 @@ export default defineConfig({
     ['meta', { name: 'author', content: 'XIA' }],
     // Open Graph 标签（社交媒体分享）
     ['meta', { property: 'og:type', content: 'website' }],
+    ['meta', { property: 'og:url', content: 'https://pinellia.cn/' }],
+    ['meta', { property: 'og:site_name', content: 'XIA 技术博客' }],
     ['meta', { property: 'og:title', content: 'XIA - 个人技术博客' }],
     ['meta', { property: 'og:description', content: '探索……沉淀……成长！分享技术学习笔记和实践经验' }],
     ['meta', { property: 'og:image', content: 'https://banxia-log.oss-cn-beijing.aliyuncs.com/public/logo.bmp' }],
+    ['meta', { property: 'og:image:width', content: '1200' }],
+    ['meta', { property: 'og:image:height', content: '630' }],
+    ['meta', { property: 'og:image:alt', content: 'XIA 技术博客' }],
     // Twitter Card
     ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
+    ['meta', { name: 'twitter:site', content: '@XIA' }],
     ['meta', { name: 'twitter:title', content: 'XIA - 个人技术博客' }],
-    ['meta', { name: 'twitter:description', content: '探索……沉淀……成长！分享技术学习笔记和实践经验' }]
+    ['meta', { name: 'twitter:description', content: '探索……沉淀……成长！分享技术学习笔记和实践经验' }],
+    ['meta', { name: 'twitter:image', content: 'https://banxia-log.oss-cn-beijing.aliyuncs.com/public/logo.bmp' }]
   ],
   description: "探索……沉淀……成长！分享技术学习笔记和实践经验",
   
