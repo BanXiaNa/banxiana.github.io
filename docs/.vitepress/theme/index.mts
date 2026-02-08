@@ -2,8 +2,8 @@
 import DefaultTheme from 'vitepress/theme'
 import './style/index.css'
 import { watch, h } from 'vue'
-import SeasonSwitcher from './components/SeasonSwitcher.vue'
 import VisitorCounter from './components/VisitorCounter.vue'
+import FloatingToolbar from './components/FloatingToolbar.vue'
 
 export default {
     extends: DefaultTheme,
@@ -11,17 +11,17 @@ export default {
     Layout: () => {
         return h(DefaultTheme.Layout, null, {
             'layout-bottom': () => h('div', [
-                h(SeasonSwitcher),
-                h(VisitorCounter)
+                h(VisitorCounter),
+                h(FloatingToolbar)
             ])
         })
     },
 
     enhanceApp({app , router }) {
-        // 注册季节切换器组件
-        app.component('SeasonSwitcher', SeasonSwitcher)
         // 注册访客统计组件
         app.component('VisitorCounter', VisitorCounter)
+        // 注册悬浮工具栏组件
+        app.component('FloatingToolbar', FloatingToolbar)
         
         // 季节性动画效果初始化
         if (typeof window !== 'undefined') {
