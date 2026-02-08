@@ -283,7 +283,7 @@ onMounted(() => {
 /* 工具菜单 */
 .tool-menu {
   position: absolute;
-  bottom: 70px;
+  bottom: 70px;  /* 改为从主按钮上方展开 */
   right: 0;
   display: flex;
   flex-direction: column;
@@ -351,7 +351,7 @@ onMounted(() => {
 .submenu {
   position: absolute;
   right: 60px;
-  top: 0;
+  bottom: 0;  /* 改为从按钮底部对齐，向上展开 */
   background: var(--vp-c-bg);
   border: 1px solid var(--vp-c-divider);
   border-radius: 12px;
@@ -421,7 +421,7 @@ onMounted(() => {
 .menu-slide-enter-from,
 .menu-slide-leave-to {
   opacity: 0;
-  transform: translateY(20px);
+  transform: translateY(20px);  /* 向下滑出效果 */
 }
 
 .submenu-slide-enter-active,
