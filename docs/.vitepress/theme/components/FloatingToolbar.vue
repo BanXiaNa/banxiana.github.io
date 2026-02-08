@@ -20,6 +20,16 @@
       </transition>
     </button>
     
+    <!-- 成功提示气泡 -->
+    <transition name="toast">
+      <div v-if="showToast" class="success-toast">
+        <svg class="check-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+        <span>{{ toastMessage }}</span>
+      </div>
+    </transition>
+    
     <!-- 工具菜单 -->
     <transition name="menu-slide">
       <div v-if="isOpen" class="tool-menu">
@@ -104,6 +114,8 @@ const isOpen = ref(false)
 const showShare = ref(false)
 const showSeason = ref(false)
 const currentSeason = ref('auto')
+const showToast = ref(false)
+const toastMessage = ref('')
 
 const currentUrl = typeof window !== 'undefined' ? window.location.href : 'https://pinellia.cn'
 const title = 'XIA - 个人技术博客'
@@ -179,13 +191,21 @@ const toggleSeason = () => {
   showShare.value = false
 }
 
+// 显示成功提示
+const showSuccessToast = (message: string) => {
+  toastMessage.value = message
+  showToast.value = true
+  setTimeout(() => {
+    showToast.value = false
+  }, 2000)
+}
+
 // 处理分享
 const handleShare = (platform: string) => {
   console.log(`分享到 ${platform}`)
   if (platform === '微信') {
-    setTimeout(() => {
-      alert('请使用微信扫描二维码分享')
-    }, 100)
+    // 微信分享显示提示
+    showSuccessToast('请扫描二维码分享')
   }
 }
 
@@ -193,8 +213,7 @@ const handleShare = (platform: string) => {
 const copyLink = async () => {
   try {
     await navigator.clipboard.writeText(currentUrl)
-    alert('链接已复制到剪贴板！')
-    isOpen.value = false
+    showSuccessToast('链接已复制')
     showShare.value = false
   } catch (err) {
     const input = document.createElement('input')
@@ -203,8 +222,7 @@ const copyLink = async () => {
     input.select()
     document.execCommand('copy')
     document.body.removeChild(input)
-    alert('链接已复制到剪贴板！')
-    isOpen.value = false
+    showSuccessToast('链接已复制')
     showShare.value = false
   }
 }
@@ -278,6 +296,28 @@ onMounted(() => {
 .main-button.active {
   background: var(--vp-c-brand-2);
   transform: rotate(90deg);
+}
+
+/* 成功提示气泡 */
+.success-toast {
+  position: fixed;
+  bottom: 150px;
+  right: 90px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: #10b981;
+  color: white;
+  border-radius: 50px;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  z-index: 1000;
+}
+
+.check-icon {
+  flex-shrink: 0;
 }
 
 /* 工具菜单 */
@@ -435,6 +475,37 @@ onMounted(() => {
   transform: translateX(20px);
 }
 
+/* Toast 动画 */
+.toast-enter-active {
+  animation: toast-in 0.3s ease;
+}
+
+.toast-leave-active {
+  animation: toast-out 0.3s ease;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateX(20px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes toast-out {
+  from {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(20px) scale(0.9);
+  }
+}
+
 /* 移动端适配 */
 @media (max-width: 768px) {
   .floating-toolbar {
@@ -445,6 +516,13 @@ onMounted(() => {
   .main-button {
     width: 48px;
     height: 48px;
+  }
+  
+  .success-toast {
+    bottom: 130px;
+    right: 70px;
+    padding: 10px 16px;
+    font-size: 13px;
   }
   
   .tool-item {
