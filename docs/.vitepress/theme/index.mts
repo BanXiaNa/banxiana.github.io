@@ -4,12 +4,14 @@ import './style/index.css'
 import { watch, h } from 'vue'
 import VisitorCounter from './components/VisitorCounter.vue'
 import FloatingToolbar from './components/FloatingToolbar.vue'
+import ArticleMetadata from './components/ArticleMetadata.vue'
 
 export default {
     extends: DefaultTheme,
     
     Layout: () => {
         return h(DefaultTheme.Layout, null, {
+            'doc-before': () => h(ArticleMetadata),
             'layout-bottom': () => h('div', [
                 h(VisitorCounter),
                 h(FloatingToolbar)
@@ -22,6 +24,8 @@ export default {
         app.component('VisitorCounter', VisitorCounter)
         // 注册悬浮工具栏组件
         app.component('FloatingToolbar', FloatingToolbar)
+        // 注册文章统计组件
+        app.component('ArticleMetadata', ArticleMetadata)
         
         // 季节性动画效果初始化
         if (typeof window !== 'undefined') {
