@@ -27,6 +27,63 @@ export default {
         // 注册文章统计组件
         app.component('ArticleMetadata', ArticleMetadata)
         
+        // 图片懒加载
+        if (typeof window !== 'undefined') {
+            // 使用 Intersection Observer API 实现懒加载
+            const imageObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target as HTMLImageElement
+                        const src = img.dataset.src
+                        if (src) {
+                            img.src = src
+                            img.removeAttribute('data-src')
+                            imageObserver.unobserve(img)
+                            
+                            // 添加淡入动画
+                            img.style.opacity = '0'
+                            img.style.transition = 'opacity 0.3s ease-in-out'
+                            img.onload = () => {
+                                img.style.opacity = '1'
+                            }
+                        }
+                    }
+                })
+            }, {
+                rootMargin: '50px' // 提前 50px 开始加载
+            })
+            
+            // 处理页面中的所有图片
+            const setupLazyLoading = () => {
+                setTimeout(() => {
+                    const images = document.querySelectorAll('.vp-doc img:not([data-lazy-processed])')
+                    images.forEach(img => {
+                        const imgElement = img as HTMLImageElement
+                        // 标记已处理
+                        imgElement.dataset.lazyProcessed = 'true'
+                        
+                        // 如果图片还没加载，设置懒加载
+                        if (imgElement.src && !imgElement.complete) {
+                            imgElement.dataset.src = imgElement.src
+                            imgElement.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1"%3E%3C/svg%3E'
+                            imageObserver.observe(imgElement)
+                        } else if (imgElement.src) {
+                            // 已加载的图片添加 loading 属性
+                            imgElement.loading = 'lazy'
+                        }
+                    })
+                }, 100)
+            }
+            
+            // 初始化
+            setupLazyLoading()
+            
+            // 监听路由变化
+            router.onAfterRouteChanged = () => {
+                setupLazyLoading()
+            }
+        }
+        
         // 季节性动画效果初始化
         if (typeof window !== 'undefined') {
             // 监听路由变化，在主页显示季节动画
