@@ -55,7 +55,7 @@ export default defineConfig({
         text: '📝 我的文章',
         items: [
           { text: '📐 设计模式', link: '/pages/Articles/DesignPattern/DesignPattern' },
-          { text: '📋 Git 提交规范', link: '/pages/Articles/GitCommitConventions' }
+          { text: '📋 Git 提交规范', link: '/pages/Articles/GitCommitConventions/GitCommitConventions' }
         ]
       },
       { 
@@ -115,7 +115,7 @@ export default defineConfig({
               }
             ]
           },
-          { text: 'Git 提交规范', link: '/pages/Articles/GitCommitConventions' }
+          { text: 'Git 提交规范', link: '/pages/Articles/GitCommitConventions/GitCommitConventions' }
         ]
       },
       {

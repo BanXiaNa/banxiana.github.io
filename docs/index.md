@@ -36,7 +36,7 @@ features:
   - icon: 📋
     title: Git 提交规范
     details: 规范化的 Git 提交信息格式，提升团队协作效率
-    link: /pages/Articles/GitCommitConventions
+    link: /pages/Articles/GitCommitConventions/GitCommitConventions
   - icon: 🌟
     title: 持续更新
     details: 定期更新技术文章，跟上技术发展趋势，与你一起在技术路上不断前行
