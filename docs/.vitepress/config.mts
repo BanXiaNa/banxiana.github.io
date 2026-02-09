@@ -54,7 +54,6 @@ export default defineConfig({
       { 
         text: '📝 我的文章',
         items: [
-          { text: '☕ Java 八股小记', link: '/pages/Articles/JavaInterview/JavaInterview' },
           { text: '📐 设计模式', link: '/pages/Articles/DesignPattern/DesignPattern' },
           { text: '📋 Git 提交规范', link: '/pages/Articles/GitCommitConventions/GitCommitConventions' }
         ]
@@ -78,14 +77,6 @@ export default defineConfig({
       {
         text: '📝 我的文章',
         items: [
-          { 
-            text: 'Java 八股小记',
-            link: '/pages/Articles/JavaInterview/JavaInterview',
-            collapsed: false,
-            items: [
-              { text: 'Java 集合框架', link: '/pages/Articles/JavaInterview/JavaCollection' }
-            ]
-          },
           { 
             text: '设计模式',
             link: '/pages/Articles/DesignPattern/DesignPattern',
@@ -210,15 +201,6 @@ export default defineConfig({
 
     //返回顶部文字修改
     returnToTopLabel:'返回顶部',
-    
-    // 右侧大纲标题
-    outlineTitle: '目录',
-    
-    // 大纲显示层级
-    outline: {
-      level: [1, 6],
-      label: '目录'
-    },
     
     // 最后更新时间文本
     lastUpdated: {

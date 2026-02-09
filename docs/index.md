@@ -17,10 +17,6 @@ hero:
     src: https://banxia-log.oss-cn-beijing.aliyuncs.com/public/logo.bmp
     alt: XIA Tech Blog
 features:
-  - icon: ☕
-    title: Java 八股小记
-    details: 系统整理 Java 面试高频考点，涵盖基础、进阶、框架、分布式等核心知识
-    link: /pages/Articles/JavaInterview/JavaInterview
   - icon: 📐
     title: 设计模式精讲
     details: 深入浅出地讲解经典设计模式，从理论到实践，提升代码质量和架构思维
