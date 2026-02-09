@@ -216,7 +216,7 @@ export default defineConfig({
     
     // 大纲显示层级
     outline: {
-      level: [2, 6],
+      level: [1, 6],
       label: '目录'
     },
     
