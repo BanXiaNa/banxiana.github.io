@@ -4,7 +4,7 @@
 
 ## 📚 内容概览
 
-- **[Java 集合框架](./JavaCollection.md)**：Collection、List、Set、Map 等核心集合类详解
+- **[Java 集合框架](./JavaCollection/JavaCollection.md)**：Collection、List、Set、Map 等核心集合类详解
 
 ## 🎯 学习建议
 

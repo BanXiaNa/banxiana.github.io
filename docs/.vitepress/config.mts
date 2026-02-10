@@ -83,7 +83,7 @@ export default defineConfig({
             link: '/pages/Articles/JavaInterview/JavaInterview',
             collapsed: false,
             items: [
-              { text: 'Java 集合框架', link: '/pages/Articles/JavaInterview/JavaCollection' }
+              { text: 'Java 集合框架', link: '/pages/Articles/JavaInterview/JavaCollection/JavaCollection' }
             ]
           },
           { 
