@@ -4,7 +4,7 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: "XIA",
   head: [
-    ['link', { rel: 'icon', href: "https://banxia-log.oss-cn-beijing.aliyuncs.com/public/logo.bmp" }],
+    ['link', { rel: 'icon', href: "/favicon.ico" }],
     // SEO Meta 标签
     ['meta', { name: 'keywords', content: 'MySQL, Spring, 设计模式, Java, 技术博客, 编程, 数据库' }],
     ['meta', { name: 'author', content: 'XIA' }],
@@ -14,16 +14,18 @@ export default defineConfig({
     ['meta', { property: 'og:site_name', content: 'XIA 技术博客' }],
     ['meta', { property: 'og:title', content: 'XIA - 个人技术博客' }],
     ['meta', { property: 'og:description', content: '探索……沉淀……成长！分享技术学习笔记和实践经验' }],
-    ['meta', { property: 'og:image', content: 'https://banxia-log.oss-cn-beijing.aliyuncs.com/public/logo.bmp' }],
-    ['meta', { property: 'og:image:width', content: '1200' }],
-    ['meta', { property: 'og:image:height', content: '630' }],
+    ['meta', { property: 'og:image', content: 'https://pinellia.cn/logo.png' }],
+    ['meta', { property: 'og:image:type', content: 'image/png' }],
+    ['meta', { property: 'og:image:width', content: '800' }],
+    ['meta', { property: 'og:image:height', content: '800' }],
     ['meta', { property: 'og:image:alt', content: 'XIA 技术博客' }],
+    ['meta', { property: 'og:locale', content: 'zh_CN' }],
     // Twitter Card
     ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
     ['meta', { name: 'twitter:site', content: '@XIA' }],
     ['meta', { name: 'twitter:title', content: 'XIA - 个人技术博客' }],
     ['meta', { name: 'twitter:description', content: '探索……沉淀……成长！分享技术学习笔记和实践经验' }],
-    ['meta', { name: 'twitter:image', content: 'https://banxia-log.oss-cn-beijing.aliyuncs.com/public/logo.bmp' }]
+    ['meta', { name: 'twitter:image', content: 'https://pinellia.cn/logo.png' }]
   ],
   description: "探索……沉淀……成长！分享技术学习笔记和实践经验",
   
@@ -42,7 +44,7 @@ export default defineConfig({
     // https://vitepress.dev/reference/default-theme-config
 
     // 左上角logo
-    logo: "https://banxia-log.oss-cn-beijing.aliyuncs.com/public/logo.bmp",
+    logo: "/logo.svg",
     //本地搜索
     search: {
       provider: 'local'
