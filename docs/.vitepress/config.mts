@@ -85,7 +85,9 @@ export default defineConfig({
             link: '/pages/Articles/JavaInterview/JavaInterview',
             collapsed: false,
             items: [
-              { text: 'Java 集合框架', link: '/pages/Articles/JavaInterview/JavaCollection/JavaCollection' }
+              { text: 'Java 集合框架', link: '/pages/Articles/JavaInterview/JavaCollection/JavaCollection' },
+              { text: 'Java 并发编程', link: '/pages/Articles/JavaInterview/JavaConcurrency/JavaConcurrency' },
+              { text: 'JVM 虚拟机', link: '/pages/Articles/JavaInterview/JVM/JVM' }
             ]
           },
           { 

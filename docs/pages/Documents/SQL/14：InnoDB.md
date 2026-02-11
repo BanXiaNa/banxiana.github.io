@@ -1,4 +1,4 @@
-# InnoDB
+﻿# InnoDB
 
 ## 逻辑存储结构
 
@@ -71,7 +71,7 @@
 
 ​	创建：
 
-```mysql
+```sql
 create tablespace tablespace_name
     add datafile 'file_name'
     engine 'engine_name';
@@ -79,7 +79,7 @@ create tablespace tablespace_name
 
 ​	指定：
 
-```mysql
+```sql
 create table table_name tablespace tablespace_name;
 ```
 
@@ -173,7 +173,7 @@ create table table_name tablespace tablespace_name;
 
 **当前读**：会读取数据的最新版本，并保证读取过程中不被其他指令修改
 
-```mysql
+```sql
 # 下面两条语句都可以实现当前读
 select ... lock in share mode (共享锁);
 select ... for update; (update , insert , delete 都是排它锁)

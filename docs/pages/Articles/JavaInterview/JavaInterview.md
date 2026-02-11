@@ -5,6 +5,8 @@
 ## 📚 内容概览
 
 - **[Java 集合框架](./JavaCollection/JavaCollection.md)**：Collection、List、Set、Map 等核心集合类详解
+- **[Java 并发编程](./JavaConcurrency/JavaConcurrency.md)**：线程、锁、并发工具类等核心知识
+- **[JVM 虚拟机](./JVM/JVM.md)**：内存模型、垃圾回收、类加载机制等
 
 ## 🎯 学习建议
 
