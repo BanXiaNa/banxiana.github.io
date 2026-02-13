@@ -56,8 +56,7 @@ export default defineConfig({
       { 
         text: '📝 我的文章',
         items: [
-          { text: '☕ Java 八股小记', link: '/pages/Articles/JavaInterview/JavaInterview' },
-          { text: '🔴 Redis 笔记', link: '/pages/Articles/RedisNotes/RedisNotes' },
+          { text: '📚 面试笔记', link: '/pages/Articles/InterviewNotes/' },
           { text: '📐 设计模式', link: '/pages/Articles/DesignPattern/DesignPattern' },
           { text: '📋 Git 提交规范', link: '/pages/Articles/GitCommitConventions/GitCommitConventions' }
         ]
@@ -82,21 +81,27 @@ export default defineConfig({
         text: '📝 我的文章',
         items: [
           { 
-            text: 'Java 八股小记',
-            link: '/pages/Articles/JavaInterview/JavaInterview',
+            text: '面试笔记',
+            link: '/pages/Articles/InterviewNotes/',
             collapsed: false,
             items: [
-              { text: 'Java 集合框架', link: '/pages/Articles/JavaInterview/JavaCollection/JavaCollection' },
-              { text: 'Java 并发编程', link: '/pages/Articles/JavaInterview/JavaConcurrency/JavaConcurrency' },
-              { text: 'JVM 虚拟机', link: '/pages/Articles/JavaInterview/JVM/JVM' }
-            ]
-          },
-          { 
-            text: 'Redis 笔记',
-            link: '/pages/Articles/RedisNotes/RedisNotes',
-            collapsed: false,
-            items: [
-              // 这里后续可以添加具体的 Redis 主题
+              {
+                text: 'Java 技术栈',
+                collapsed: false,
+                items: [
+                  { text: 'Java 基础', link: '/pages/Articles/InterviewNotes/Java/JavaBasic/JavaBasic' },
+                  { text: 'Java 集合框架', link: '/pages/Articles/InterviewNotes/Java/JavaCollection/JavaCollection' },
+                  { text: 'Java 并发编程', link: '/pages/Articles/InterviewNotes/Java/JavaConcurrency/JavaConcurrency' },
+                  { text: 'JVM 虚拟机', link: '/pages/Articles/InterviewNotes/Java/JVM/JVM' }
+                ]
+              },
+              {
+                text: '中间件技术',
+                collapsed: false,
+                items: [
+                  { text: 'Redis 笔记', link: '/pages/Articles/InterviewNotes/Redis/RedisNotes' }
+                ]
+              }
             ]
           },
           { 
