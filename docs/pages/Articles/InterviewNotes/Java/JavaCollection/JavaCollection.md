@@ -37,6 +37,56 @@
 
 # List
 
+## Java ArrayList 的扩容机制是什么？ 
+
+ArrayList 在每次添加数据的时候都会对其进行大小检查，如果发现装不下了，就会进行扩容，扩容的基数的1.5，也就是说，10长度的数组被扩容后会变成15，具体来说是：`newCapacity = oldCapacity + (oldCapacity >> 1)`，然后会将数据迁移到新数组，最后修改 elementData 的引用，指向新数组。
+
+如果想要的大小超过了 int 的上限的时候，就通过 hugeCapacity 方法请求提供一个合法的大小，他的逻辑很简单，如果我们请求的大小是一个负数，就意味着之前的加法已经溢出了，这时候就抛出 OutOfMemoryError 表示溢出。接下来，他会返回两种值：
+
+- 一种是 `MAX_ARRAY_SIZE`，他是 `Integer.MAX_VALUE -8`的值，因为 ArrayList 的头结点根据不同的 JVM 可能存放不同的值，所以空出八个槽位用于数据存储
+- 第二种是 `Integer.MAX_VALUE`他会在请求值大于 `MAX_ARRAY_SIZE`的情况下被返回，跟放手一搏差不多
+
+## ArrayList 的 elementData 为什么用 transient 修饰？
+
+为了防止序列化写入过多的空值，elementData 通常情况下实际长度大于使用的长度，默认序列化的时候会将这些空值写入，浪费空间。ArrayList 自己实现了 writeObject 和 readObject 方法，序列化的只有使用的部分，
+
+## 如果大量创建 new ArrayList 不往里面放东西，有什么危害？怎么解决的？
+
+如果大量创建新的 ArrayList 不仅会占用大量的堆内存，而且对GC的回收负担也很大
+
+解决方法：ArrayList 里提供了两个字段：`EMPTY_ELEMENTDATA``DEFAULTCAPACITY_EMPTY_ELEMENTDATA`，二者针对长度为0的创建操作和长度为10的默认创建操作进行优化，通过这两种方式创建的数组都指向这两个字段，用于减小内存开销和GC压力
+
+## ArrayList 能存多少个元素？
+
+理论上的上限是 `Integer.MAX_VALUE`也就是大约21亿，但是实际上也受 JVM 限制，如果是64位的JVM，开了压缩指针每个引用也要占用8字节，差不多16G的内存就消耗在了引用上面，另外，数组的头部也有元数据开销，所以也受JVM的内存限制
+
+## Arrays.copyOf 和 System.arraycopy 有什么区别？
+
+Arrays.copyOf 底层也是去调用 System.arraycopy 所以其实性能上没差别，但是 System.arraycopy 需要去指定复制到什么地方，Arrays.copyOf 在调用 System.arraycopy 之前就准备好了这个地方，不需要手动指定
+
+## Java 中 ArrayList 和 LinkedList 有什么区别？ 
+
+底层数据结构不同，ArrayList 底层是数组，LinkedList 底层是双向链表，这决定了他们的性能差异
+
+- ArrayList 作为连续的数据结构，查找效率为 O(1)，直接定位下标就行，但是插入数据为 O(n)，因为需要对后面的元素进行移位
+- LinkedList 使用双向链表作为底层结构，查找效率为 O(n)，因为需要挨个遍历所有节点，但是对头尾节点的操作是 O(1)，改地址就行
+
+实际使用还是推荐使用 ArrayList，连续的数据结构缓存友好
+
+其次，内存占用差距也不小，ArrayList 作为连续的数据结构，每个对象只占一个对象引用，四或八字节（开指针压缩就是四），而双向链表就不同了，他需要存放数据，前驱，后继，对象头，一个节点差不多是二十四字节，开销差了6倍
+
+## ArrayList 的中间插入真的很慢吗？
+
+我们了解到的，中间插入要将后面的数据后移，时间复杂度是 O(n)，但是，插入操作使用了 System.arraycopy 方法，是 native 方法，适合大批量内存整体移动，CPU对此类操作做了大量优化，其性能开销其实不是很大，远低于链表型数据结构的中间插入操作
+
+## 为什么 JDK 官方建议用 ArrayDeque 而不是 LinkedList 实现栈和队列？
+
+ArrayDeque 底层是循环数组，内存连续，CPU缓存友好，性能自然高，其次其不像链表，需要维护这么多的指针，开销也小，除非要去存 Null，不然 ArrayDeque 各方面都很优秀
+
+## ArrayList 和 Vector 有什么区别？
+
+Vector 老古董了，JDK1的元老，线程安全，所有的方法都加了 synchronized，性能较低。JDK1.2加入了 ArrayList，不加锁，性能好，但是线程不安全，为了线程安全可以使用 synchronizedList 包裹 ArrayList 实现。
+
 ## Java 中的 CopyOnWriteArrayList 是什么？ 
 
 CopyOnWriteArrayList 使用写时复制来保证线程安全，具体操作是在写的时候先对旧数组做一份拷贝，然后修改新数组，然后用新数组的引用取代旧数组的引用。读操作直接读取旧数组，实现读写分离
@@ -48,6 +98,30 @@ CopyOnWriteArrayList 使用写时复制来保证线程安全，具体操作是�
 ## Java 的 CopyOnWriteArrayList 和 Collections.synchronizedList 有什么区别？分别有什么优缺点？
 
 对于保证线程安全的方法不一样，synchronizedList 靠的是给所有方法加锁，这样并发性能低，CopyOnWriteArrayList 采用写时复制设计，读操作不加锁，写操作操作副本，并发程度高，另外 synchronizedList 在迭代器遍历场景下性能不如 CopyOnWriteArrayList 因为 CopyOnWriteArrayList 是使用快照遍历，而 synchronizedList 得加锁
+
+## 写时复制会不会有内存问题？
+
+会的，如果写入操作十分频繁，就会同时存在多个数组的副本，严重情况可能内存爆掉，抛OOM
+
+## CopyOnWriteArrayList 能保证实时一致性吗？
+
+不可以，因为 CopyOnWriteArrayList 采用写时复制技术，读操作本质上只是读取副本，在读操作进行的时候如果有写数据，是拿不到的，如果想要拿到最新数据，就得加锁，这样性能太低，属于是 CopyOnWriteArrayList 高读速的代价了
+
+## CopyOnWriteArrayList 在迭代的时候能修改吗？
+
+可以的，迭代操作和修改操作不是操作同一个数组，迭代操作在迭代器创建的时候就拿到了数组的快照，是在这里进行的，修改操作是在新数组上进行的，互相独立，不会抛出 ConcurrentModificationException，但是迭代看到的数据可能是老旧的，当然，这在读多写少的情况下并不可怕
+
+## CopyOnWriteArrayList 的迭代器支持 remove 操作吗？
+
+并不支持，因为迭代器操作拿到的是是数据的快照，快照是只读的，强行操作只会抛 UnsupportedOperationException，删除只能调用 CopyOnWriteArrayList 自己的 remove 方法咯
+
+## CopyOnWriteArrayList 适合存几万条数据吗？
+
+不适合，CopyOnWriteArrayList 采用写时复制技术，写的时候会 copy 整个数组，如果数据量非常大，每次写的内存开销也非常大，会频繁触发GC，上万的数据还是用别的吧
+
+## synchronizedList 和 Vector 有什么区别？
+
+性能上差不多，Vector 的每个方法都加上了 synchronized，synchronizedList 是在最外面套上了 synchronized，Vector 有点老旧，synchronizedList 可以包装任意实现了 List 接口的类，更加灵活
 
 
 
@@ -211,7 +285,7 @@ Value 是强引用，但是 WeakHashMap 在每次被操作的时候，都会触�
 
 TreeMap的底层是红黑树，先天具有排序功能，也可以自定义排序规则
 
-## Java 中的 TreeMap 是什么？ 
+## Java 中的红黑树是什么？ 
 
 红黑树就是一个二叉树，所以查找也是二叉搜索数查找，比当前节点小就往左走，大就往右走
 
@@ -273,6 +347,35 @@ HashMap 在被创建的时候，容量总是2的幂次方，也就是说传入10
 ## 位运算比取模快多少？有没有具体的性能数据？
 
 x86 的系统架构下，除法需要 20 到 40 个时钟周期，而位运算只需要一个就可以了，差的不是一点半点，其实从操作上来说感知其实差距不大，但是 HashMap 的存取操作十分频繁，差距就体现出来了，对于一些高性能框架，使用位运算优化是很常见的操作
+
+## ConcurrentHashMap 和 Hashtable 的区别是什么？ 
+
+Hashtable 和 ConcurrentHashMap 都是线程安全的 map，但是实现方式不同
+
+- Hashtable 非常暴力，在整个 map 上加了一个大锁，所以并发性能很差
+- ConcurrentHashMap 将整个哈希桶分成了 16 个部分，每个单独加锁，理论上可以有16 个线程去同时访问，在JDK8之后，又做了优化，现在锁的粒度是每个桶，并发效率更高
+
+另外 Hashtable 和 ConcurrentHashMap 都不能存储 null，都是因为不能保证多线程情况下放的到底是 null 还是确实不存在
+
+## 说说ConcurrentHashMap 的 CAS + synchronized 机制？
+
+CAS + synchronized 机制是针对不同情况下的哈希桶的操作。
+
+- CAS 是针对空的哈希桶的操作，使用 CAS 直接插入新节点，不用加锁
+- synchronized 是针对发生了哈希碰撞的桶采取的情况，他会将哈希桶的头节点加锁，也就是 Node 或者 TreeBin，来保证线程安全
+
+## 说说 ConcurrentHashMap 对 size 方法的特殊处理？
+
+对于并发场景下使用的 ConcurrentHashMap 来说，维护一个全局的，单一的 size 是不现实的，不可能所有 put 的线程都去做 size 的竞争
+
+ConcurrentHashMap 创建了两个地方用于存储：
+
+- baseCount：作为基础计数，在竞争不激烈的情况下，BaseCount 会去更新，
+- counterCells 是一个数组，当 baseCount 被使用的时候，其他线程就去这个数组，随机的找一块地方更新一下就完了
+
+然后计数的时候就将他们加起来，这就是最后得到的 size
+
+这样做肯定不精确，因为可能会发生前面的数组刚被遍历完，又被更改了的情况，导致得到的结果是近似值，但是问题不大啦，对于 ConcurrentHashMap 来说，最终一致性已经很不错了
 
 
 
