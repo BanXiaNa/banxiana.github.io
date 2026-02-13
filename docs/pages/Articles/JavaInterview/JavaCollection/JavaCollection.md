@@ -47,6 +47,8 @@ CopyOnWriteArrayList 使用写时复制来保证线程安全，具体操作是�
 
 ## Java 的 CopyOnWriteArrayList 和 Collections.synchronizedList 有什么区别？分别有什么优缺点？
 
+对于保证线程安全的方法不一样，synchronizedList 靠的是给所有方法加锁，这样并发性能低，CopyOnWriteArrayList 采用写时复制设计，读操作不加锁，写操作操作副本，并发程度高，另外 synchronizedList 在迭代器遍历场景下性能不如 CopyOnWriteArrayList 因为 CopyOnWriteArrayList 是使用快照遍历，而 synchronizedList 得加锁
+
 
 
 # Map

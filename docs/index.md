@@ -21,6 +21,10 @@ features:
     title: Java 八股小记
     details: 系统整理 Java 面试高频考点，涵盖基础、进阶、框架、分布式等核心知识
     link: /pages/Articles/JavaInterview/JavaInterview
+  - icon: 🔴
+    title: Redis 笔记
+    details: Redis 核心知识点和实战经验，包括数据结构、持久化、集群等
+    link: /pages/Articles/RedisNotes/RedisNotes
   - icon: 📐
     title: 设计模式精讲
     details: 深入浅出地讲解经典设计模式，从理论到实践，提升代码质量和架构思维
