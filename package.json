@@ -1,7 +1,6 @@
 {
   "devDependencies": {
-    "vitepress": "^2.0.0-alpha.15",
-    "vitepress-plugin-music": "^0.0.9"
+    "vitepress": "^2.0.0-alpha.15"
   },
   "scripts": {
     "docs:dev": "vitepress dev docs",
