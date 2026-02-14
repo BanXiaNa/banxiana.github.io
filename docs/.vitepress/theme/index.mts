@@ -5,6 +5,7 @@ import { watch, h } from 'vue'
 import VisitorCounter from './components/VisitorCounter.vue'
 import FloatingToolbar from './components/FloatingToolbar.vue'
 import ArticleMetadata from './components/ArticleMetadata.vue'
+import GlobalMusicPlayer from './components/GlobalMusicPlayer.vue'
 
 export default {
     extends: DefaultTheme,
@@ -14,7 +15,8 @@ export default {
             'doc-before': () => h(ArticleMetadata),
             'layout-bottom': () => h('div', [
                 h(VisitorCounter),
-                h(FloatingToolbar)
+                h(FloatingToolbar),
+                h(GlobalMusicPlayer)
             ])
         })
     },
@@ -26,6 +28,16 @@ export default {
         app.component('FloatingToolbar', FloatingToolbar)
         // 注册文章统计组件
         app.component('ArticleMetadata', ArticleMetadata)
+        
+        // 注释掉全局音乐播放器，改为单独页面组件
+        // const playlist = [
+        //     {
+        //         name: 'ワールドイズマイン (World is Mine)',
+        //         author: 'supercell feat. 初音ミク',
+        //         file: '/music/world-is-mine.flac',
+        //     }
+        // ]
+        // vitepressMusic(playlist)
         
         // 图片懒加载
         if (typeof window !== 'undefined') {

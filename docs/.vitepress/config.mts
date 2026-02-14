@@ -73,7 +73,8 @@ export default defineConfig({
         items: [
           { text: '🐍 Python 基础教程', link: '/pages/Groceries/MAGAOPythonNotesS1' }
         ]
-      }
+      },
+      { text: '🎵 音乐站', link: '/pages/Music/' }
     ],
 
     sidebar: [
