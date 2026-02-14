@@ -377,6 +377,12 @@ ConcurrentHashMap 创建了两个地方用于存储：
 
 这样做肯定不精确，因为可能会发生前面的数组刚被遍历完，又被更改了的情况，导致得到的结果是近似值，但是问题不大啦，对于 ConcurrentHashMap 来说，最终一致性已经很不错了
 
+## Java 中 ConcurrentHashMap 1.7 和 1.8 之间有哪些区别？ 
+
+- 锁的粒度：1.7使用的是多个 Segment 数组，他们共同组成 ConcurrentHashMap，每个 Segment 数组单独加锁，以此提高并发效率。1.8 使用整个数组来作为 ConcurrentHashMap，每个哈希桶使用 CAS + synchronized 提升并发效率
+- 扩容：1.7 之前因为使用的是分段管理，所以每个 segment 数组单独维护自己的扩容，每个 segment 都有自己的负载因子，扩容的时候单个扩容，不影响其他的 segment 工作。1.8 使用整体数组，当需要扩容的时候，整体开始扩容，过程通过 CAS 确保线程安全，而且引用渐进式扩容，提升了扩容效率，而且来访问的其他线程发现正在扩容之后，也会去协助扩容
+- size 的计算区别：1.7 使用分段数组，计算总体 size 的时候，有一个小巧思：他会先进行不加锁的计算所有 segment 的 size 的 sum。如果三次都一样，说明结果是对的，数量没有变化，就直接返回，如果数量有变化，就说明当前有线程去操作数组，就会将整体的数组进行加锁，然后去计算。1.8 之后采用的设计是维护了两个变量，一个是 long 类型的 BaseCount，另外一个就是 CounterCell 数组，CounterCell 里面只有一个 long 类型的 Value。使用 Contended 来防止伪共享。当发生增删的时候，首先去操作 BaseCount，如果 BaseCount 正在被使用，转而去 CounterCell 数组中随便找个地方记录一下更改，之所以重新创建一个 CounterCell 对象，是为了防止连续的数组带来的伪共享。计算 size 的时候，就把他们的加起来就行了
+
 
 
 # Set
