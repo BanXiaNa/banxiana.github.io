@@ -17,6 +17,27 @@ export const musicPlaylist = ref<Track[]>([
     file: '/music/japanese/ワールドイズマイン-supercell_初音ミク-1252051-2000.flac',
     cover: 'https://banxia-log.oss-cn-beijing.aliyuncs.com/public/logo.bmp',
     category: 'japanese'
+  },
+  {
+    name: 'Butterfly',
+    author: '雅-MIYAVI',
+    file: '/music/japanese/Butterfly-雅MIYAVI-72923431-2000.flac',
+    cover: 'https://banxia-log.oss-cn-beijing.aliyuncs.com/public/logo.bmp',
+    category: 'japanese'
+  },
+  {
+    name: '故郷の原風景 (故乡的原风景)',
+    author: '宗次郎',
+    file: '/music/light/故郷の原風景-宗次郎-229351415-2000.flac',
+    cover: 'https://banxia-log.oss-cn-beijing.aliyuncs.com/public/logo.bmp',
+    category: 'light'
+  },
+  {
+    name: '蓄勢 ～ GEAR UP ～',
+    author: '采风乐坊',
+    file: '/music/rock/蓄勢_～_GEAR_UP_～-采风乐坊-6336174-320.mp3',
+    cover: 'https://banxia-log.oss-cn-beijing.aliyuncs.com/public/logo.bmp',
+    category: 'rock'
   }
   // 在这里添加更多歌曲
 ])

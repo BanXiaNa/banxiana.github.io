@@ -236,10 +236,11 @@ const updateDuration = () => {
 // 广播状态到页面播放器
 const broadcastState = () => {
   if (typeof window !== 'undefined') {
+    const track = currentTrack.value
     window.dispatchEvent(new CustomEvent('globalMusicStateUpdate', {
       detail: {
         isPlaying: isPlaying.value,
-        currentIndex: currentIndex.value,
+        currentTrack: track, // 传递完整的歌曲对象
         currentTime: currentTime.value,
         duration: duration.value
       }
@@ -312,14 +313,29 @@ const handleError = (e: Event) => {
 // 监听全局播放事件
 const handleGlobalPlay = (event: CustomEvent) => {
   console.log('全局播放事件触发:', event.detail)
-  const { index } = event.detail
+  const { track } = event.detail
+  
+  if (!track) {
+    console.error('没有收到歌曲信息')
+    return
+  }
+  
   // 先显示播放器
   isInitialized.value = true
+  
+  // 在完整播放列表中找到这首歌的索引
+  const trackIndex = playlist.value.findIndex(t => t.file === track.file)
+  
+  if (trackIndex === -1) {
+    console.error('在播放列表中找不到这首歌:', track)
+    return
+  }
+  
+  console.log('找到歌曲索引:', trackIndex)
+  
   // 等待 DOM 更新后再播放
   nextTick(() => {
-    if (index !== undefined) {
-      playTrack(index)
-    }
+    playTrack(trackIndex)
   })
 }
 

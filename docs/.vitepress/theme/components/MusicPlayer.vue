@@ -200,16 +200,16 @@ const playTrack = (index: number) => {
   errorMessage.value = ''
   currentIndex.value = index
   
+  const track = playlist.value[index]
   console.log('=== 页面播放器：播放曲目 ===')
   console.log('index:', index)
-  console.log('track:', playlist.value[index])
-  console.log('window 对象存在:', typeof window !== 'undefined')
+  console.log('track:', track)
   
-  // 触发全局播放器
+  // 触发全局播放器，传递完整的歌曲信息
   if (typeof window !== 'undefined') {
     console.log('触发全局播放事件')
     const event = new CustomEvent('globalMusicPlay', {
-      detail: { index }
+      detail: { track }
     })
     console.log('事件对象:', event)
     window.dispatchEvent(event)
@@ -221,19 +221,23 @@ const playTrack = (index: number) => {
 
 // 上一曲
 const previous = () => {
-  if (typeof window !== 'undefined') {
-    window.dispatchEvent(new CustomEvent('globalMusicControl', {
-      detail: { action: 'previous' }
-    }))
+  // 在当前过滤列表中切换
+  if (currentIndex.value > 0) {
+    playTrack(currentIndex.value - 1)
+  } else {
+    // 循环到最后一首
+    playTrack(playlist.value.length - 1)
   }
 }
 
 // 下一曲
 const next = () => {
-  if (typeof window !== 'undefined') {
-    window.dispatchEvent(new CustomEvent('globalMusicControl', {
-      detail: { action: 'next' }
-    }))
+  // 在当前过滤列表中切换
+  if (currentIndex.value < playlist.value.length - 1) {
+    playTrack(currentIndex.value + 1)
+  } else {
+    // 循环到第一首
+    playTrack(0)
   }
 }
 
@@ -281,11 +285,18 @@ onMounted(() => {
     
     // 监听全局播放器的状态更新
     window.addEventListener('globalMusicStateUpdate', ((e: CustomEvent) => {
-      const { isPlaying: playing, currentIndex: index, currentTime: time, duration: dur } = e.detail
+      const { isPlaying: playing, currentTrack: track, currentTime: time, duration: dur } = e.detail
       isPlaying.value = playing
-      currentIndex.value = index
       currentTime.value = time
       duration.value = dur
+      
+      // 根据当前播放的歌曲，在过滤后的列表中找到对应的索引
+      if (track) {
+        const index = playlist.value.findIndex(t => t.file === track.file)
+        if (index !== -1) {
+          currentIndex.value = index
+        }
+      }
     }) as EventListener)
     
     // 监听全局播放器的错误事件
