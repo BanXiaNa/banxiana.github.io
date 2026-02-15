@@ -28,21 +28,21 @@ export const musicPlaylist = ref<Track[]>([
   {
     name: '不问天 (cover 说说Crystal)',
     author: '兰音Reine',
-    file: '/music/chinese/不问天_(cover__说说Crystal)-兰音Reine-177216088-20201.flac',
+    file: '/music/chinese/不问天-兰音Reine.flac',
     cover: 'https://banxia-log.oss-cn-beijing.aliyuncs.com/public/logo.bmp',
     category: 'chinese'
   },
   {
     name: '天知河',
     author: '说说Crystal',
-    file: '/music/chinese/天知河-说说Crystal-356404562-2000.flac',
+    file: '/music/chinese/天知河-说说Crystal.flac',
     cover: 'https://banxia-log.oss-cn-beijing.aliyuncs.com/public/logo.bmp',
     category: 'chinese'
   },
   {
     name: '小孩小孩【2023拜年纪单品】',
     author: '刷牙',
-    file: '/music/chinese/小孩小孩【2023拜年纪单品】-刷牙-259377242-20201.flac',
+    file: '/music/chinese/小孩小孩-刷牙.flac',
     cover: 'https://banxia-log.oss-cn-beijing.aliyuncs.com/public/logo.bmp',
     category: 'chinese'
   },
