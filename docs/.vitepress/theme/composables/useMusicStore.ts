@@ -10,6 +10,13 @@ export interface Track {
 }
 
 // 播放列表 - 统一管理
+
+// name: '歌曲名称',
+// author: '艺术家名称',
+// file: '/music/分类文件夹/音频文件.flac', 支持 .flac, .mp3, .wav 等
+// cover: '封面图片URL',                   可以是本地路径或外部URL
+// category: 'japanese'                   分类标签
+
 export const musicPlaylist = ref<Track[]>([
   {
     name: 'ワールドイズマイン (World is Mine)',
@@ -26,7 +33,7 @@ export const musicPlaylist = ref<Track[]>([
     category: 'japanese'
   },
   {
-    name: '不问天 (cover 说说Crystal)',
+    name: '不问天',
     author: '兰音Reine',
     file: '/music/chinese/不问天-兰音Reine.flac',
     cover: 'https://banxia-log.oss-cn-beijing.aliyuncs.com/public/logo.bmp',
@@ -40,14 +47,14 @@ export const musicPlaylist = ref<Track[]>([
     category: 'chinese'
   },
   {
-    name: '小孩小孩【2023拜年纪单品】',
+    name: '小孩小孩',
     author: '刷牙',
     file: '/music/chinese/小孩小孩-刷牙.flac',
     cover: 'https://banxia-log.oss-cn-beijing.aliyuncs.com/public/logo.bmp',
     category: 'chinese'
   },
   {
-    name: '故郷の原風景 (故乡的原风景)',
+    name: '故郷の原風景',
     author: '宗次郎',
     file: '/music/light/故郷の原風景-宗次郎-229351415-2000.flac',
     cover: 'https://banxia-log.oss-cn-beijing.aliyuncs.com/public/logo.bmp',
