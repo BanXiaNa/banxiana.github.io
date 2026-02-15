@@ -34,8 +34,8 @@ export const musicPlaylist = ref<Track[]>([
   },
   {
     name: '不问天',
-    author: '兰音Reine',
-    file: '/music/chinese/不问天-兰音Reine.flac',
+    author: '说说Crystal',
+    file: '/music/chinese/不问天-说说Crystal-169211217-2000.flac',
     cover: 'https://banxia-log.oss-cn-beijing.aliyuncs.com/public/logo.bmp',
     category: 'chinese'
   },
@@ -47,9 +47,9 @@ export const musicPlaylist = ref<Track[]>([
     category: 'chinese'
   },
   {
-    name: '小孩小孩',
+    name: '小孩小孩【2023拜年纪单品】',
     author: '刷牙',
-    file: '/music/chinese/小孩小孩-刷牙.flac',
+    file: '/music/chinese/小孩小孩【2023拜年纪单品】-刷牙-259377242-100.ogg',
     cover: 'https://banxia-log.oss-cn-beijing.aliyuncs.com/public/logo.bmp',
     category: 'chinese'
   },
