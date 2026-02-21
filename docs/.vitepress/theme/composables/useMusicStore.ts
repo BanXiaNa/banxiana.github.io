@@ -47,9 +47,16 @@ export const musicPlaylist = ref<Track[]>([
     category: 'chinese'
   },
   {
-    name: '小孩小孩【2023拜年纪单品】',
+    name: '小孩小孩',
     author: '刷牙',
     file: '/music/chinese/小孩小孩【2023拜年纪单品】-刷牙-259377242-100.ogg',
+    cover: 'https://banxia-log.oss-cn-beijing.aliyuncs.com/public/logo.bmp',
+    category: 'chinese'
+  },
+  {
+    name: '365里路',
+    author: '庄学忠',
+    file: '/music/chinese/365里路-庄学忠-44494231-2000.flac',
     cover: 'https://banxia-log.oss-cn-beijing.aliyuncs.com/public/logo.bmp',
     category: 'chinese'
   },
@@ -64,6 +71,13 @@ export const musicPlaylist = ref<Track[]>([
     name: '蓄勢 ～ GEAR UP ～',
     author: '采风乐坊',
     file: '/music/rock/蓄勢_～_GEAR_UP_～-采风乐坊-6336174-320.mp3',
+    cover: 'https://banxia-log.oss-cn-beijing.aliyuncs.com/public/logo.bmp',
+    category: 'rock'
+  },
+  {
+    name: '逻辑与诡计',
+    author: '杉森雅和',
+    file: '/music/rock/ロジックとトリック-杉森雅和-67006632-320.mp3',
     cover: 'https://banxia-log.oss-cn-beijing.aliyuncs.com/public/logo.bmp',
     category: 'rock'
   }
