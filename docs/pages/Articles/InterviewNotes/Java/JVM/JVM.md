@@ -67,16 +67,53 @@ Epoch 是 Mark Word 在偏向锁状态用于记录版本号的区域，用于优
 
 在 Java 中，作为 synchronized 的底层实现，用于保证多线程运行时的线程安全，每一个 Java 对象都有一个 Monitor。
 
-数据结构：
+其实这玩意在 HotSpot 中是 C++ 实现的，叫做 ObjectMonitor，里面东西还挺多的。
+
+大概的数据结构：
 
 - _header：备份 Mark Word 的数据
 - _owner：存储现在持有锁的线程
+- _object：存储当前的锁对象
 - _recursions：记录同一个线程重入的次数，用于实现重入机制
 - _cxq：用于存放刚到但是没有抢到锁的线程
 - _EntryList：存储没有抢到锁的的 **BLOCKED** 线程
 - _WaitSet：存储正在等待的 **WAITING** 线程
 
-当持锁线程准备释放锁时，它会从 `_cxq` 中挑一批线程挪到 `_EntryList` 里。它是为了减轻 _cxq 的压力。如果不分这两个队列，成百上千个线程都在一个链表上 CAS 抢位置，性能会很差
+没错，他维护了两个抢不到锁而陷入等待的线程链表，注释上说同一个线程要么在 _cxq 上面，要么在 _EntryList 上
+
+**解锁操作：**
+
+当持锁线程准备释放锁时，会根据策略的不同选择不同的唤醒等待线程的策略：
+
+- 如果 recursions 不为0，说明当前是重入状态，_recursions--，然后直接返回
+- 如果 QMode == 2 并且 cxq 队列不为空，则直接唤醒 cxq 队列头部的线程，绕过 entityList 然后返回
+- 如果 QMode == 3 并且 cxq 队列不为空，则将 cxq 队列的线程迁移到 _EntryList 的头部
+- 如果 QMode == 4 并且 cxq 队列不为空，则将 cxq 队列的线程迁移到 _EntryList 的尾部
+- 最后如果没有返回的话，唤醒 _EntryList 头部的线程，然后返回
+
+维护两个队列的目的就是提升性能，_cxq 的 CAS 压力很大，分离解耦可以减少 CAS 的压力
+
+**wait 操作：**
+
+这个没啥说的，就是将自己加入到 _WaitSet 中，然后释放锁
+
+**notify 操作：**
+
+从 _WaitSet 头部拿取线程，根据策略不同放到 cxq 或者 entityList 头部或者尾部 然后唤醒
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

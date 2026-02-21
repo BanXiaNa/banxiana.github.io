@@ -60,7 +60,29 @@ Synchronized 主要依赖于对象头 Mark Word 和 Monitor 对象监视器
 其对于方法和代码块的实现方式不同
 
 - 修饰方法的时候会在方法的访问标志加上 ACC_SYNCHRONIZED 标志，当线程进入被 ACC_SYNCHRONIZED 标记的方法前，会尝试去获取这个对象的监视器锁，成功了才会继续执行，失败就去等待了
-- 修饰代码块时，编译器会在上下分别加上 monitorenter 和 monitorexit 表示监视器锁获取和监视器锁释放，monitorexit 会在正常退出和异常退出分别被加入，以保证所有情况都能正常解锁。当线程执行的时候
+- 修饰代码块时，编译器会在上下分别加上 monitorenter 和 monitorexit 表示监视器锁获取和监视器锁释放，monitorexit 会在正常退出和异常退出分别被加入，以保证所有情况都能正常解锁。当线程执行的时候读取到 monitorenter 时尝试获取对象的 Monitor 锁，成功就进入临界区工作，失败就进入阻塞队列，执行 monitorexit 进行锁的释放并且唤醒一部分在等待队列的线程
+
+不管作用于方法还是代码块，本质上都是获取某个对象的 Monitor 锁
+
+- 代码块加锁：获取锁对象的 Monitor 锁
+- 实例方法：获取实例对象的 Monitor 锁
+- 静态方法：获取类对象的 Monitor 锁
+
+## 为什么 synchronized 不需要手动解锁，底层是怎么保证的？
+
+编译器在生成字节码文件的时候会自动加上 monitorenter 和 monitorexit，并且还在异常出口处也加上了 monitorexit，保证了在执行的时候会正常的获取锁和释放锁，不会缺漏
+
+## 锁升级过程中，偏向锁撤销为什么要在安全点进行？
+
+因为 撤销偏向锁要遍历栈，找到持有这个锁的栈帧，修改他的 Lock Record，如果这个时候有线程在运行，数据就会乱掉，得在大家都安全的时候进行更改，这也是废弃的原因之一，撤销的开销太大
+
+## 轻量级锁的 Lock Record 里存的是什么？为什么要拷贝 Mark Word？
+
+存放的是 Lock Record 里面主要是 Mark Word 的拷贝和锁对象的指针，拷贝 Mark Word 的原因是撤销锁的时候会用到，在重入的时候，也会创建一个新的 Lock Record，但是不会去拷贝 Mark Word，如果撤销锁的时候发现 Mark Word 是 null，就直接释放，以此判断是否重入
+
+## synchronized 能降级吗？比如从重量级锁降回轻量级锁？
+
+并不能，这套体系设计上没考虑过降级的情况，但是 GC 可以在一个重量级锁的队列中没有线程等待的时候进行降级，但这个也并不是运行时的降级，
 
 ## Synchronized 和 ReentrantLock 有什么区别？ 
 
