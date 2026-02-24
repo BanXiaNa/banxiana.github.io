@@ -167,7 +167,17 @@ export default defineConfig({
           { 
             text: 'JUC 并发编程',
             link: '/pages/Documents/JUC/',
-            collapsed: false
+            collapsed: false,
+            items: [
+              {
+                text: '并发工具',
+                collapsed: false,
+                items: [
+                  { text: 'CountDownLatch', link: '/pages/Documents/JUC/tools/CountDownLatch' },
+                  { text: 'CyclicBarrier', link: '/pages/Documents/JUC/tools/CyclicBarrier' }
+                ]
+              }
+            ]
           },
           { 
             text: 'MySQL 数据库',
