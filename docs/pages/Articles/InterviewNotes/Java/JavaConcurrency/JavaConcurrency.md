@@ -107,6 +107,14 @@ AQS 使用 CLH 队列锁的变种，具体来说是将原来的单向链表变�
 
 CLH 队列采用自旋等待前驱节点释放锁的策略，避免大量线程去 CAS 同一个变量产生总线风暴的问题，AQS 将线程从原来的前驱节点自旋改成了 park 挂起，进一步减少线程烧 CPU 的问题，但是线程挂起就不能检测前驱的状态，改成双向链表去唤醒后继节点来让队列正常工作
 
+## CountDownLatch 和 CyclicBarrier 都能实现线程等待，有什么区别？
+
+第一个区别就是 CountDownLatch 更适用于前置线程和后置线程的关系，等待前置线程完成之后，后置线程才能完成工作，而 CyclicBarrier 更适用于一组线程相互等待的场景
+
+第二个区别就是 CountDownLatch 只能是一次性使用，CyclicBarrier 则提供了重置计数的操作，这就让其天然适用于多轮操作的场景
+
+其次：CountDownLatch 是基于 AQS 实现的，而 CyclicBarrier 是 ReentrantLock + Condition
+
 ## 说说 CLH 队列锁？
 
 CLH 队列锁是为了解决大量线程去自旋竞争锁的时候产生的总线风暴问题的。

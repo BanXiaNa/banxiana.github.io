@@ -174,7 +174,8 @@ export default defineConfig({
                 collapsed: false,
                 items: [
                   { text: 'CountDownLatch', link: '/pages/Documents/JUC/tools/CountDownLatch' },
-                  { text: 'CyclicBarrier', link: '/pages/Documents/JUC/tools/CyclicBarrier' }
+                  { text: 'CyclicBarrier', link: '/pages/Documents/JUC/tools/CyclicBarrier' },
+                  { text: 'Semaphore', link: '/pages/Documents/JUC/tools/Semaphore' }
                 ]
               }
             ]

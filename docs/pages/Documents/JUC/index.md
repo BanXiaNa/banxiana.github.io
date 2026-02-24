@@ -15,6 +15,7 @@
 
 - [CountDownLatch](./tools/CountDownLatch.md) - 线程同步工具类
 - [CyclicBarrier](./tools/CyclicBarrier.md) - 线程同步工具类
+- [Semaphore](./tools/Semaphore.md) - 信号量工具类
 
 
 ## 🚀 持续更新中
