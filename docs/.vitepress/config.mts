@@ -61,13 +61,14 @@ export default defineConfig({
           { text: '📋 Git 提交规范', link: '/pages/Articles/GitCommitConventions/GitCommitConventions' }
         ]
       },
-      { 
-        text: '📖 我的文档',
-        items: [
-          { text: '🌱 Spring 小记', link: '/pages/Documents/SpringNotes/' },
-          { text: '🗄️ MySQL 数据库', link: '/pages/Documents/SQL/' }
-        ]
-      },
+      {
+          text: '📖 我的文档',
+          items: [
+            { text: '🌱 Spring 小记', link: '/pages/Documents/SpringNotes/' },
+            { text: '🔄 JUC 并发编程', link: '/pages/Documents/JUC/' },
+            { text: '🗄️ MySQL 数据库', link: '/pages/Documents/SQL/' }
+          ]
+        },
       { 
         text: '🗞 杂货',
         items: [
@@ -162,6 +163,11 @@ export default defineConfig({
                 ]
               }
             ]
+          },
+          { 
+            text: 'JUC 并发编程',
+            link: '/pages/Documents/JUC/',
+            collapsed: false
           },
           { 
             text: 'MySQL 数据库',
