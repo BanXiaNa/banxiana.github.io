@@ -86,6 +86,16 @@ Synchronized 主要依赖于对象头 Mark Word 和 Monitor 对象监视器
 
 ## Java 中 ReentrantLock 的实现原理是什么？ 
 
+底层就是简单的 CAS + AQS，里边还是一个 state 用于计数 + 一个队列用于等待
+
+加锁的时候线程先去看看这个锁是公平还是非公平，然后决定是去检测阻塞队列还是去 CAS state
+
+CAS state 的时候，会将 0 改成 1，表示这个锁已经被持有，并将 exclusiveOwnerThread 设置为自己，失败了就去排队，park 挂起
+
+## ReentrantLock 的 lock 方法忘记 unlock 会怎样？
+
+线程会一直持有锁，其他线程竞争不到锁，程序会卡死一般情况下必须用 try-finally 包起来，finally 里面 unlock，保证任何情况下都能释放锁，这就不得不提到 synchronized 了，这玩意自动释放，简单高效
+
 ## 说说 AQS 吧？
 
 AQS 是 JUC 里面锁和同步器的基础框架
@@ -107,6 +117,18 @@ AQS 使用 CLH 队列锁的变种，具体来说是将原来的单向链表变�
 
 CLH 队列采用自旋等待前驱节点释放锁的策略，避免大量线程去 CAS 同一个变量产生总线风暴的问题，AQS 将线程从原来的前驱节点自旋改成了 park 挂起，进一步减少线程烧 CPU 的问题，但是线程挂起就不能检测前驱的状态，改成双向链表去唤醒后继节点来让队列正常工作
 
+## AQS 里的 Node 有哪些等待状态？
+
+5 种：
+
+- CANCELLED 是 1，节点被取消了要从队列摘掉
+- 0 是初始状态；
+- SIGNAL 是 -1，表示后继节点需要被唤醒
+- CONDITION 是 -2，节点在条件队列里等着
+- PROPAGATE 是 -3，共享模式下用来传播唤醒信
+
+正数只有 CANCELLED 一种，所以源码里经常用 waitStatus > 0 来判断节点是否取消。
+
 ## CountDownLatch 和 CyclicBarrier 都能实现线程等待，有什么区别？
 
 第一个区别就是 CountDownLatch 更适用于前置线程和后置线程的关系，等待前置线程完成之后，后置线程才能完成工作，而 CyclicBarrier 更适用于一组线程相互等待的场景
@@ -114,6 +136,40 @@ CLH 队列采用自旋等待前驱节点释放锁的策略，避免大量线程�
 第二个区别就是 CountDownLatch 只能是一次性使用，CyclicBarrier 则提供了重置计数的操作，这就让其天然适用于多轮操作的场景
 
 其次：CountDownLatch 是基于 AQS 实现的，而 CyclicBarrier 是 ReentrantLock + Condition
+
+## 什么是 Java 的 Semaphore？ 
+
+它是基于 AQS 实现的信号量计数器，将 AQS 的 state 定义为信号量，获取信号量时如果state > 0，state-1，反之去队列阻塞，返还信号量时，state+1，然后去队列唤醒头部等待线程
+
+## 什么是公平锁、非公平锁？
+
+其最大的区别就是新来的线程的行为：
+
+- 公平锁：新来的线程会去检测阻塞队列，如果里面有东西，他会去排队，并不会去竞争锁，这样可以保证每个线程都有机会抢到锁，不会被饿死，但是吞吐量低，效率不高，适合顺序敏感性场景
+- 非公平锁：新到的线程直接去竞争锁，失败了才将自己插入阻塞队列。吞吐量高，但是线程可能被饿死
+
+## 说说 Semaphore 与 synchronized、Lock 的区别
+
+他们的语义不一样，后者是互斥锁，同时只能有一个线程去进入临界区，但是 semaphore 可以同时允许多个线程进入临界区
+
+前者适用于做控制连接池，并发流量控制场景，后者更多用来保护共享数据读写安全
+
+## Semaphore 能实现互斥锁的效果吗？怎么做？
+
+可以的，互斥锁的本质就是只能有一个线程去访问临界区，只需要把 state 设置成 1 就能实现互斥锁的效果，但是 Semaphore 本身不支持重入，所以会产生重入死锁的情况
+
+## 如果我 release 调用次数比 acquire 多会怎样？
+
+因为 semaphore 并不会检测线程归还动作的合法性，如果 release 比 acquire 多的话，state 就会变多，这样就会脱离 semaphore 本身的限流作用，所以一般要使用 try-finally 保证 state 总数不变
+
+## Semaphore 的 acquire 方法有几种变体？各自什么场景用？
+
+四种：
+
+- acquire()：阻塞等待，可被中断
+- acquireUninterruptibly()：阻塞等待，忽略中断信号
+- tryAcquire()：非阻塞，立刻返回成功或失败
+- tryAcquire(timeout, unit)：带超时的阻塞，超时返回 false
 
 ## 说说 CLH 队列锁？
 
@@ -151,6 +207,25 @@ QNode 会扮演三种角色
 Synchronized 是 JAVA 提供的关键字，用起来很简单，全权由 JVM 管理，而 ReentrantLock 需要自己手动获取释放锁，相对应的 Synchronized 的自由度就低很多，包括但不限于只支持非公平锁，不可中断，超时获取不支持，但是方便。
 
 其实性能方面差不多，Synchronized 在一开始的情况下性能不如 ReentrantLock，但是经过优化之后就差不多了，使用的时候只用考虑场景问题而不用考虑性能问题
+
+## ReentrantLock 和 synchronized 怎么选？
+
+在性能上二者都差不多，Synchronized 比较简便，适用于大多数场景，而 ReentrantLock 比较适合于高级的应用场景，比如超时，条件获取等操作
+
+## 为什么 AQS 用双向链表而不是单向链表？
+
+- 首先，AQS 的 CLH 队列锁中的线程并不会去一直在自己的前驱自旋，而是采用唤醒的方式，双向链表可以完成这个功能
+- 其次，如果节点被撤销的话，单向链表只能从头部进行遍历找到后继，而双向链表可以直接定位后继
+
+## tryLock 和 lock 有什么区别？
+
+Lock 是尝试获取锁，如果获取不到就等待，一直等，tryLock 是尝试获取锁，获取不到就返回false，适合快速失败的场景，他还有一个重载，可以传入时间，超时就放弃，更加灵活
+
+前者可以避免死锁，如果一方获取不到锁就释放掉持有的锁
+
+## state 变量为什么用 int 不用 boolean？
+
+首先是为了灵活性，state 如果只有 true 和 false 两种状态就不能很灵活的应用到各种场景，比如锁的重入机制就是通过累加 state 来进行实现的，比如 CountDownLatch 使用 state 表示还剩余多少前置线程没完成工作，这都是灵活性的表现
 
 ## 什么是可重入锁，怎么实现的？
 

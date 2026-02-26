@@ -383,6 +383,33 @@ ConcurrentHashMap 创建了两个地方用于存储：
 - 扩容：1.7 之前因为使用的是分段管理，所以每个 segment 数组单独维护自己的扩容，每个 segment 都有自己的负载因子，扩容的时候单个扩容，不影响其他的 segment 工作。1.8 使用整体数组，当需要扩容的时候，整体开始扩容，过程通过 CAS 确保线程安全，而且引用渐进式扩容，提升了扩容效率，而且来访问的其他线程发现正在扩容之后，也会去协助扩容
 - size 的计算区别：1.7 使用分段数组，计算总体 size 的时候，有一个小巧思：他会先进行不加锁的计算所有 segment 的 size 的 sum。如果三次都一样，说明结果是对的，数量没有变化，就直接返回，如果数量有变化，就说明当前有线程去操作数组，就会将整体的数组进行加锁，然后去计算。1.8 之后采用的设计是维护了两个变量，一个是 long 类型的 BaseCount，另外一个就是 CounterCell 数组，CounterCell 里面只有一个 long 类型的 Value。使用 Contended 来防止伪共享。当发生增删的时候，首先去操作 BaseCount，如果 BaseCount 正在被使用，转而去 CounterCell 数组中随便找个地方记录一下更改，之所以重新创建一个 CounterCell 对象，是为了防止连续的数组带来的伪共享。计算 size 的时候，就把他们的加起来就行了
 
+## ConcurrentHashMap  的 1.8 的渐进式扩容会不会导致读操作读到不一致的数据？
+
+并不会，原理是正处于扩容时的 ConcurrentHashMap 在被读取数据的时候会去旧数组中读取数据，如果当前哈希桶被迁移完毕，他会将这个哈希桶置为：ForwardingNode，这个节点的哈希值为 -1，当读取到这个值的时候，会去新数组中读取数据，所以能正确读到
+
+## ConcurrentHashMap 的 key 和 value 能不能为 null？为什么？
+
+不可以，因为在并发场景下，不能准确区分是完全没有这个值还是用 Null 表示值，containsKey 也不能区分，因为在调用 containsKey 和 git 之间可能有别的线程来修改值，导致结果并不准确
+
+## 如果业务上必须用 ConcuttentHashMap 存储 Null 怎么办？
+
+可以使用一个特殊的占位符代表，取的时候检测一下，如果是的话就返回 Null 就可以了
+
+## HashMap 为什么可以存 null？
+
+因为 HashMap 用于单线程下，在单线程下，containsKey 和 get 之间不会有别的线程来捣乱，所以并不会出现 null 歧义的问题
+
+## Hashtable 也不支持 null，是因为并发问题吗？
+
+HashTable 老古董了，当时就不允许使用 Null，也没有说明原因。后面的 ConcuttentHashMap 沿用了这个设计，并且说明了原因，可以让语义更加清晰
+
+## Java 中的 HashMap 和 Hashtable 有什么区别？ 
+
+- 线程安全：HashMap 线程不安全，但是单线程下性能高，HashTable 线程安全，但是效率低下
+- NUll 处理：HashMap 允许一个 NUll K 和 多个 NUll V，但是 HashTable 不允许 NUll
+- 继承不同，HashMap 继承自 AbstractMap，HashTable 继承自 Dictionary ，这玩意早就废弃了
+- 迭代器机制差异，HashMap 使用的是  fail-fast 迭代器，在结构改变的时候会直接报错，而 HashTable 是弱一致性，改变了也不会报错
+
 
 
 # Set
