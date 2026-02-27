@@ -37,6 +37,28 @@
 
 # List
 
+## Java 中的 List 接口有哪些实现类？ 
+
+List 接口主要有这几个实现类：ArrayList、LinkedList、Vector、Stack、CopyOnWriteArrayList。
+
+常用的就是 ArrayList 和 LinkedList，两者的线程都不安全
+
+ArrayList 底层是数组，LinkedList 底层是链表
+
+线程安全通常选择 CopyOnWriteArrayList，采用写时复制，线程安全
+
+## 数组和链表在 Java 中的区别是什么？ 
+
+主要是内存布局，数组是连续的内存，比较紧凑，通过 基地址 + 元素下标 * 元素大小 就能进行快速定位，随机访问速度是 O（1)，为了保证连续性，其插入操作需要将后面的元素全部后移，最坏是 O（N），而链表则是通过指针连接起来的，不需要连续空间，在内存中通常是散布的状态，插入操作只需要更改指针就行，O（1），但是访问就得从头开始访问了，效率是 O（N），但是问题有了，如果我们没有拿到要被插入的节点，就要从头开始找了，这效率就很低了。
+
+由于数组的连续性加上现代 CPU 读取缓存的特性，导致数组的缓存友好性更好，这也就是为什么 ArrayList 比 LinkedList 效率更高的原因，虽然理论上他的插入效率更快
+
+数组的代表就是 ArrayList，链表的代表就是 LinkedList，实际情况中除了需要频繁修改头结点和当做队列来用的情况下，都建议使用 ArrayList
+
+## LinkedList 为什么实现了 Deque 接口？
+
+LinkedList 天生适用于做队列使用，头尾的增删都是 O（1），所以其能当做数组，队列，栈使用，比较全能了
+
 ## Java ArrayList 的扩容机制是什么？ 
 
 ArrayList 在每次添加数据的时候都会对其进行大小检查，如果发现装不下了，就会进行扩容，扩容的基数的1.5，也就是说，10长度的数组被扩容后会变成15，具体来说是：`newCapacity = oldCapacity + (oldCapacity >> 1)`，然后会将数据迁移到新数组，最后修改 elementData 的引用，指向新数组。
@@ -123,7 +145,10 @@ CopyOnWriteArrayList 使用写时复制来保证线程安全，具体操作是�
 
 性能上差不多，Vector 的每个方法都加上了 synchronized，synchronizedList 是在最外面套上了 synchronized，Vector 有点老旧，synchronizedList 可以包装任意实现了 List 接口的类，更加灵活
 
+## 为什么不推荐用 Stack 类？
 
+- stack 继承自 Vector，语义上偏向栈是向量，不准确，而且栈应该只暴露 push / pop / peek 操作，而不应该暴露 Vector 的 get / set / remove 操作
+- 由于继承了 Vector，其本身就带有了粗粒度的锁，效率低下
 
 # Map
 
@@ -410,17 +435,71 @@ HashTable 老古董了，当时就不允许使用 Null，也没有说明原因�
 - 继承不同，HashMap 继承自 AbstractMap，HashTable 继承自 Dictionary ，这玩意早就废弃了
 - 迭代器机制差异，HashMap 使用的是  fail-fast 迭代器，在结构改变的时候会直接报错，而 HashTable 是弱一致性，改变了也不会报错
 
+## Java 中 ConcurrentHashMap 的 get 方法是否需要加锁？ 
+
+不需要的，首先要清楚 get 操作需要几步完成：
+
+- 通过 Hash 计算下标，然后通过 getObjectVolatile 读取数组槽位
+- 解决哈希冲突，通常是遍历链表 / 红黑树
+- 读取最后的值
+
+这三部分的指令都是用 volatile 保证可见性的，并不用加锁
+
+## 既然 ConcurrentHashMap 的 get 不加锁，那 put 的时候 get 会不会读到中间状态？
+
+并不会，PUT 操作会先构建好 Node 节点，最后通过 CAS 直接添加进去，所以 get 方法要么读取到旧值，要么是新值
+
+## ConcurrentHashMap 的 size 方法是准确的吗？
+
+不准确，尤其是在高并发场景下，为了性能，concurrentHashMap 并没有对 size 进行加锁操作，所以取到的是近似值，可以自己维护一个 AtomicLong 用于计数
+
+## 为什么数组元素不直接用 volatile 修饰，而要用 Unsafe 来读？
+
+不可以，volatile 只能修饰变量，不能针对数组中的某个值进行修饰，volatile Node[] table 也只是保证对数组引用的可见性，所以 Java 采用 Unsafe 类来实现安全读
+
+## 既然 ConcurrentHashMap 这么好用，为什么不干脆把 HashMap 也做成线程安全的？
+
+因为 HashMap 本身就是为了单线程的环境设计的，加锁反而降低性能，就算是 CAS 也要有开销
+
+## ConcurrentHashMap 能保证复合操作的原子性吗？比如先判断再插入？
+
+不可以，单个的 get 和 put 都是原子的，但是 if-absent-then-put 这种操作是不行的，ConcurrentHashMap 提供了 putIfAbsent、computeIfAbsent 这些原子方法来解决这个问题
+
+## 高并发场景下，ConcurrentHashMap 和加了 synchronized 的 HashMap 哪个快？
+
+ConcurrentHashMap 快，Synchronized 是在外面套了个锁，所有的操作都互斥，和 HashTable 没区别了， ConcurrentHashMap 的锁粒度在 1.8 之后优化到了桶级别，而且读操作不加锁，效率大大滴
+
+## Java 中的 LinkedHashMap 是什么？ 
+
 
 
 # Set
 
+## Java 中的 HashSet 和 HashMap 有什么区别？ 
 
+存储模型不同，HashSet 存储单列数据，HashMap 存储双列数据
 
+但是 HashSet 底层套了 HashMap，他的 K 就是 Set 的值，Value 统一设定为 PRESENT 的空 Object 占位，所以 HashSet 的去重，查找的本质就是 HashMap 对 K 的操作
 
+## HashSet 套用 HashMap Value 的位置不就浪费内存空间了吗？
 
+不是，Value 统一设定为 PRESENT 的空 Object 占位，这个东西是单例的，也就是说，所有的 Value 都指向一个东西，并不会浪费内存
 
+## LinkedHashSet 和 TreeSet？
 
+LinkedHashSet 底层是 LinkedHashMap，通过双向链表维护插入的顺序
 
+TreeSet 底层是 TreeMep，底层是红黑树，支持自定义排序，查找速度慢，但是支持一些范围查询操作
 
+## HashSet 的 add 方法返回值是什么含义？
 
+本质上是套用 HashMap 的 put 方法，表示集合是否发生了变化，也就是说，如果之前没有这个值，插入了，就返回 true，如果之前就有这个，插入了，就返回 false。
+
+## HashSet 怎么判断两个元素是否相等的？
+
+首先计算 HashCode，如果不相等直接过，相等就用 equals 判断，不相等就直接过，所以自定义对象的存储，必须同时重写 HashCode 和 equals
+
+## 如果只重写 equals 不重写 hashCode 会怎样？
+
+如果不重写 HashCode，不同对象的 内存地址肯定不同，算出的 HashCode 极大概率不同，HashSet 就失去了去重的能力，就废了
 
