@@ -471,6 +471,42 @@ ConcurrentHashMap 快，Synchronized 是在外面套了个锁，所有的操作�
 
 ## Java 中的 LinkedHashMap 是什么？ 
 
+LinkedHashMap 继承 HashMap，然后在每个节点上面维护了两个节点用于组成双向链表
+
+它有两种排序模式，第一种是插入顺序，谁先 PUT 谁就在前面，第二种是访问顺序，谁被 get 、put 谁就被移动到最后面
+
+这种结构非常适合做 LRU 缓存 
+
+## LinkedHashMap 是线程安全的吗？多线程环境下怎么用？
+
+不安全，因为继承自 HashMap，本身又没做处理，所以线程不安全，如果想要线程安全的话，可以使用 Collections.synchronizedMap 包装一下，或者使用 ConcurrentLinkedHashMap 的第三方库
+
+## LinkedHashMap 遍历的时间复杂度是多少？和 HashMap 有什么区别？
+
+O（N），但是这个遍历的时候不会走空桶，因为他是使用链表管理的
+
+## accessOrder 为 true 时，哪些操作会触发节点移动？
+
+accessOrder 为 true 代表要按照访问顺序排序，get、getOrDefault、compute、computeIfPresent、merge 这些读写操作，还有 put 已存在的 key，都会触发 afterNodeAccess 把节点挪到尾部。单纯的 containsKey 不会触发，因为它只是查有没有，不算"访问"
+
+## 为什么 LRU 要用双向链表？单向链表行不行？
+
+不行，删除节点需要同时更新前后两个节点，为了效率不能再从头遍历，效率太低
+
+## Java 中的 IdentityHashMap 是什么？ 
+
+identityHashMap 是一种特殊实现，他判断两个键是否相等用的是 ==，而不是 equals，也就是说，他只认这个对象本身作为键，举例来说，我们可以往里面放两个 new String（1），他算作两个对象，因为两个字符串的内存地址不相同
+
+底层实现直接用的是 Obj 的数组，偶数下标是 k，奇数下标是 v，内存紧凑，缓存命中率高，但是使用探针寻址，处理冲突效率低
+
+## 什么情况下用 IdentityHashMap 会踩坑？
+
+拿字符串做 K 的时候会容易出现问题，"abc" 和 new String("abc")不是一个东西，会变成两个 key
+
+## System.identityHashCode 和对象默认的 hashCode 有什么关系？
+
+如果没有重写 hashCode 方法， 返回值是一样的，如果重写了，调用前者仍然返回之前的地址相关值，就是为了有一个保底的手段用来计算相关值，防止重写丢失功能
+
 
 
 # Set
@@ -503,3 +539,22 @@ TreeSet 底层是 TreeMep，底层是红黑树，支持自定义排序，查找�
 
 如果不重写 HashCode，不同对象的 内存地址肯定不同，算出的 HashCode 极大概率不同，HashSet 就失去了去重的能力，就废了
 
+# 其他
+
+## 你遇到过 ConcurrentModificationException 错误吗？它是如何产生的？ 
+
+它是由于迭代器 fail-fast 机制抛出的异常，用于检测一边遍历一边修改的操作
+
+具体来说就是：集合维护了一个 modCount 变量，用于计算集合被修改的次数，当迭代器被创建的时候，他会拷贝一份备份出来，每次遍历的时候会进行一次对比，当两个值不相等的时候说明发生了修改，修改了就报错
+
+## 用 synchronizedList 包装 ArrayList 能避免这个异常吗？
+
+不会，synchronizedList 只是给每个方法加锁，方法之间还是可以并行访问的，要么直接换 CopyOnWriteArrayList，他直接在迭代器创建的时候弄个快照
+
+## ConcurrentHashMap 迭代器迭代时能保证看到最新数据吗？
+
+不能，其迭代器是弱一致性的，创建之后的迭代器是看不到遍历过后的桶的新数据的
+
+## 为什么 CopyOnWriteArrayList 写入性能差？
+
+因为使用写时复制技术，每次写入都要 copy 一整个新数组，如果数据量很大，copy 的开销也会直线上升，GC的压力也大，这玩意适合读多写少的场景
