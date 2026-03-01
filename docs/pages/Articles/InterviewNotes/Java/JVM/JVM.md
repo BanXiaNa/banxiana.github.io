@@ -101,7 +101,13 @@ Epoch 是 Mark Word 在偏向锁状态用于记录版本号的区域，用于优
 
 从 _WaitSet 头部拿取线程，根据策略不同放到 cxq 或者 entityList 头部或者尾部 然后唤醒
 
+## 如何在 Java 中进行内存泄漏分析？ 
 
+- 确认是不是真的泄漏了。用 `jstat -gc <pid> 1000` 持续观察，如果老年代使用量在每次 Full GC 后不降反升，一直往上涨，基本就是泄漏了。正常的应用 Full GC 后老年代应该能回收掉大部分对象。
+
+- 导出堆快照定位泄漏对象。用 `jmap -dump:format=b,file=heap.hprof <pid>` 生成 dump 文件，然后用 MAT 打开。MAT 会自动给一份 Leak Suspects 报告，直接告诉你哪些对象占了大量内存、被谁引用着。
+
+- 顺着引用链找代码。在 MAT 里右键点 Dominator Tree 里的大对象，选 Path to GC Roots，就能看到是哪个 static 变量或者哪个线程持有了这个对象。找到代码位置后，分析为什么这个对象没被释放，然后修复。
 
 
 
