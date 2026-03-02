@@ -11,8 +11,8 @@ hero:
       text: 🚀 开始探索
       link: /pages/Articles/DesignPattern/DesignPattern
     - theme: alt
-      text: 🗄️ MySQL 文档
-      link: /pages/Documents/SQL/
+      text: 🎵 音乐站
+      link: /pages/Music/
   image:
     src: https://banxia-log.oss-cn-beijing.aliyuncs.com/public/logo.bmp
     alt: XIA Tech Blog
