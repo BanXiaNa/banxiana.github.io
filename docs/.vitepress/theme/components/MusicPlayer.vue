@@ -140,6 +140,7 @@ const categories: Category[] = [
   { key: 'japanese', name: '日文歌', icon: '🇯🇵' },
   { key: 'chinese', name: '中文歌', icon: '🇨🇳' },
   { key: 'english', name: '英文歌', icon: '🇺🇸' },
+  { key: 'misc', name: '杂语歌', icon: '🌍' },
   { key: 'light', name: '轻音乐', icon: '🎹' },
   { key: 'rock', name: '重音乐', icon: '🎸' }
 ]
@@ -635,31 +636,29 @@ onMounted(() => {
   .music-player-page {
     padding: 16px;
   }
-  
+
   .music-container {
     padding: 20px;
   }
-  
+
   .now-playing {
     flex-direction: column;
     text-align: center;
   }
-  
+
   .album-cover {
     width: 200px;
     height: 200px;
   }
-  
+
   .track-name {
     font-size: 20px;
   }
-  
+
   .track-artist {
     font-size: 14px;
   }
 }
-</style>
-
 
 /* 错误提示 */
 .error-message {
@@ -677,3 +676,4 @@ onMounted(() => {
   max-width: 90%;
   text-align: center;
 }
+</style>

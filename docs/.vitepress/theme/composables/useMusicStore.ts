@@ -80,6 +80,27 @@ export const musicPlaylist = ref<Track[]>([
     file: '/music/rock/ロジックとトリック-杉森雅和-67006632-320.mp3',
     cover: 'https://banxia-log.oss-cn-beijing.aliyuncs.com/public/logo.bmp',
     category: 'rock'
+  },
+  {
+    name: 'Lifeline',
+    author: 'Zeraphym',
+    file: '/music/light/Lifeline-Zeraphym-6913252-2000.flac',
+    cover: 'https://banxia-log.oss-cn-beijing.aliyuncs.com/public/logo.bmp',
+    category: 'light'
+  },
+  {
+    name: 'Wellerman (Sea Shanty)',
+    author: 'Nathan Evans',
+    file: '/music/english/Wellerman_(Sea_Shanty)-Nathan_Evans-162956350-2000.flac',
+    cover: 'https://banxia-log.oss-cn-beijing.aliyuncs.com/public/logo.bmp',
+    category: 'english'
+  },
+  {
+    name: 'Ơ Sao Bé Không Lak (Zarkoz Remix)',
+    author: 'Zarkoz',
+    file: '/music/misc/Ơ_Sao_Bé_Không_Lak_(Zarkoz_Remix)-Zarkoz-158506171-2000.flac',
+    cover: 'https://banxia-log.oss-cn-beijing.aliyuncs.com/public/logo.bmp',
+    category: 'misc'
   }
   // 在这里添加更多歌曲
 ])
