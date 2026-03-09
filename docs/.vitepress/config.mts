@@ -89,7 +89,7 @@ export default defineConfig({
             items: [
               {
                 text: 'Java 技术栈',
-                collapsed: false,
+                collapsed: true,
                 items: [
                   { text: 'Java 基础', link: '/pages/Articles/InterviewNotes/Java/JavaBasic/JavaBasic' },
                   { text: 'Java 集合框架', link: '/pages/Articles/InterviewNotes/Java/JavaCollection/JavaCollection' },
@@ -99,9 +99,16 @@ export default defineConfig({
               },
               {
                 text: '中间件技术',
-                collapsed: false,
+                collapsed: true,
                 items: [
                   { text: 'Redis 笔记', link: '/pages/Articles/InterviewNotes/Redis/RedisNotes' }
+                ]
+              },
+              {
+                text: '数据库技术',
+                collapsed: true,
+                items: [
+                  { text: 'MySQL 笔记', link: '/pages/Articles/InterviewNotes/MySQL/MySQLNotes' }
                 ]
               }
             ]

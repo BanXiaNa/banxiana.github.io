@@ -13,6 +13,9 @@
 ### 中间件技术
 - **[Redis 笔记](./Redis/RedisNotes.md)**：Redis 核心知识点和实战经验
 
+### 数据库技术
+- **[MySQL** 笔记**](./MySQL/MySQLNotes.md)**：MySQL 索引、事务、锁、优化等核心知识
+
 ## 🎯 学习建议
 
 1. 系统学习，循序渐进
