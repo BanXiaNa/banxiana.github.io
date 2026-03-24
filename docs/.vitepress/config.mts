@@ -142,11 +142,12 @@ export default defineConfig({
                   { text: '代理模式', link: '/pages/Articles/DesignPattern/StructuralPattern/ProxyPattern/ProxyPattern' }
                 ]
               },
-              { 
+              {
                 text: '行为型设计模式',
                 collapsed: false,
                 items: [
-                  { text: '责任链模式', link: '/pages/Articles/DesignPattern/BehavioralPattern/ChainOfResponsibilityPattern/ChainOfResponsibilityPattern' }
+                  { text: '责任链模式', link: '/pages/Articles/DesignPattern/BehavioralPattern/ChainOfResponsibilityPattern/ChainOfResponsibilityPattern' },
+                  { text: '命令模式', link: '/pages/Articles/DesignPattern/BehavioralPattern/CommandPattern/CommandPattern' }
                 ]
               }
             ]

@@ -57,7 +57,7 @@
 
 ☑ [责任链模式（Chain of Responsibility Pattern）](BehavioralPattern/ChainOfResponsibilityPattern/ChainOfResponsibilityPattern.md)
 
-☐ 命令模式（Command Pattern）
+☑ [命令模式（Command Pattern）](BehavioralPattern/CommandPattern/CommandPattern.md)
 
 ☐ 解释器模式（Interpreter Pattern）
 
