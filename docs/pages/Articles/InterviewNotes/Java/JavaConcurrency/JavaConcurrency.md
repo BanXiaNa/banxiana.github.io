@@ -956,6 +956,152 @@ Tinner 执行任务的是一个线程，源码中没有任何处理异常的操�
 
 看任务时间，尽量选择 2 的幂次来，这样计算时间取模的时候比较快，尽量让槽数覆盖任务时间，再者就是精度，对精度要求越高，槽数就越多就行
 
+## 你使用过哪些 Java 并发工具类？ 
+
+并发工具类主要在 JUC 下面，
+
+- 线程安全的集合类：**ConcurrentHashMap**、**CopyOnWriteArrayList**、ConcurrentLinkedQueue
+  - **ConcurrentHashMap：**常用的线程安全的并发哈希，1.7 之前采用 16 个分段式锁进行提高并发效率，之后使用 CAS + synchronized 单独锁住每一个哈希槽，进一步降低锁的粒度，提升并发性能
+  - **CopyOnWriteArrayList：**写时复制数组，写的时候 copy 出一个数组用于写，读操作依然读旧的，写操作完成之后再更新引用，通过写时复制实现读写分离，增加并发，但是写操作需要复制出整个数组，开销比较大， 适合读多写少
+- 原子操作类：**AtomicInteger**、**AtomicLong**、**AtomicReference**、**LongAdder**
+  - **AtomicInteger、AtomicLong、AtomicReference：**底层都是 CAS，大家都去修改一个变量，如果失败就自旋
+  - **LongAdder：**底层维护了一个 BaseCount 和一个 Cell 数组，当线程去操作 BaseCount 失败时，就去 Cell 数组去操作，计算的时候求出来总体的变化就行，效率高，但是不严格准确
+- 同步协调工具：**CountDownLatch**、**CyclicBarrier**、**Semaphore**、Phaser
+  - **CountDownLatch：**用于一组线程去等待另一组线程工作，底层是 CAS，state 表示还差多少线程完成工作，不可复用
+  - **CyclicBarrier：**用于一组线程互相等待的场景，底层是 ReentrantLock，内部主要维护了一个屏障，各个线程到达屏障相互等待，直到都到了或者屏障失效，可以复用，适合周期性任务
+  - **Semaphore：**用于限流的场景，底层依然是 CAS，state 含义为临界资源的数量，资源为 0，新线程就去等待，有人归还资源就去唤醒等待队列的线程。支持公平/非公平锁
+- 阻塞队列：**ArrayBlockingQueue**、**LinkedBlockingQueue**、PriorityBlockingQueue
+  - **ArrayBlockingQueue：**数组有界阻塞队列，缺点是生产消费使用一把锁，吞吐不高
+  - **LinkedBlockingQueue：**链表可选有界队列，创建的时候不指定大小就是无界的，维护两把锁：生产锁，消费锁，所以吞吐量更高
+
+- 锁相关：**StampedLock**、ReentrantReadWriteLock、StampedLock
+  - StampedLock：
+
+
+## 什么是 Java 的 StampedLock？
+
+stampedLock 是 Java 8 加入的新锁，适用于读多写少的场景，传统的锁读取的时候也需要加锁，stampedLock 的读锁是乐观锁，一开始读取的时候不需要获取锁，只需要获取当前锁的版本号，等待读取完毕之后再去获取一次版本号，如果两次版本号一致的话就说明这次没有线程写入，数据是对的，如果版本号不同就降级成悲观读锁
+
+和其他锁一样，读锁可以被持有多份，写锁只能有一个，读锁是支持进化成写锁的，但是不能有别的读锁被持有
+
+stampedLock 底层使用 64 位的 Long 来管理锁的，具体来说，使用 Long 的低 7 位来标记读锁的数量，第八位用来表示写锁的状态位，剩余的 56 位用来表示版本号，每次写锁释放，版本号+1，用于乐观锁的检测
+
+这玩意不支持重入，原因很简单，既然 stampedLock 使用一个 64 位的数据管理锁，就没必要再去增加开销去维护重入次数了，因为不可重入在大多数场景下是可以接受的
+
+## StampedLock 的乐观读的 validate 方法底层是怎么判断有没有写操作的？
+
+可以通过判断 StampedLock 的维护的 long 的版本号来判断是否有写操作插入，这个版本号会在写锁释放的时候 +1，如果在读操作前后这个版本号改变了，就不能保证读到的数据准确了
+
+## StampedLock 的锁升级是怎么实现的？
+
+调用 tryConvertToWriteLock。他会首先检测是否持有写锁，如果有的话返回失败，接下来，他会检测是否还存在其他的读锁，如果有的话，也失败，然后才能成功，这样可以省去一个窗口期
+
+## 为什么 StampedLock 不支持可重入？
+
+stampedLock 使用 Long 来维护锁的状态，如果还需要支持重入的话，就得单独为每个线程去维护重入次数之类的数据，代码复杂度和逻辑开销就会高不少，并且 Doug Lea 认为不可重入大多数情况下是可以接受的，所以就没做
+
+## 高并发写的场景下 StampedLock 表现怎么样？
+
+不怎么样，因为写锁的存在，乐观读锁会一直检测失败，然后重新升级为悲观锁，还不如一开始就升级为读锁，白白浪费 CPU。而且写锁竞争场景，stampedLock 也没做什么优化
+
+## 什么是 Java 的 CompletableFuture？
+
+CompletableFuture 是 java 8 引入的一个异步编程工具，属于是 Future 的上位替代，解决了 Future 的问题，比如 get 方法阻塞，没办法串联任务等
+
+completableFuture 支持链式调用，可以让任务执行完毕之后自动执行后续操作，也可以自动处理异常和最后的结果，不用手动等待结果去阻塞
+
+默认情况下，completableFuture 使用 ForkJoinPool.commonPool 线程池执行异步任务，如果有大任务占用线程池的线程，就会导致别的任务的阻塞，所以一般情况下，都建议传入一个线程池来支持异步任务的执行
+
+注意，如果不加 exceptionally 或 handle 异常会直接被吞掉，导致调试一脸懵逼
+
+## thenApply 和 thenApplyAsync 有什么区别？
+
+调用线程的区别，thenApply 调用的是之前线程池中的线程，如果线程已经完成了工作回去了，就使用调用 thenApply 的线程执行后续的操作。thenApplyAsync  会把后续的操作提交给线程池执行，如果回调用耗时操作，还是传回线程池更好
+
+## 如何使用 Java 的 CompletableFuture 实现异步编排？
+
+主要是启动异步任务，串联任务，任务组合，异常处理
+
+启动任务：supplyAsync()（有返回值）或 runAsync() 来启动任务
+
+串联任务：
+
+- thenApply()：获取上一步的结果，并且返回一个新的结果
+- thenAccept()：获取上一步的结果，处理掉
+- thenRun()：不关心上一步结果，直接执行下一个逻辑
+- thenCompose()：如果下一个操作是一步操作，可以将两个操作扁平化一层
+
+任务组合：
+
+- thenCombine()：两个任务都完成后处理结果
+- allOf()：等待所有任务完成（无返回值）
+- anyOf()：任一任务完成就返回
+
+异常处理：
+
+- exceptionally()
+- handle()
+
+异常处理挺重要，不注意的话异常直接被吞掉了
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
