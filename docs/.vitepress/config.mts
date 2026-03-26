@@ -110,6 +110,13 @@ export default defineConfig({
                 items: [
                   { text: 'MySQL 笔记', link: '/pages/Articles/InterviewNotes/MySQL/MySQLNotes' }
                 ]
+              },
+              {
+                text: '计算机网络',
+                collapsed: true,
+                items: [
+                  { text: '计算机网络笔记', link: '/pages/Articles/InterviewNotes/ComputerNetwork/ComputerNetworkNotes' }
+                ]
               }
             ]
           },

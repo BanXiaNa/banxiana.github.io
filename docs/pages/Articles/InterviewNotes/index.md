@@ -14,7 +14,10 @@
 - **[Redis 笔记](./Redis/RedisNotes.md)**：Redis 核心知识点和实战经验
 
 ### 数据库技术
-- **[MySQL** 笔记**](./MySQL/MySQLNotes.md)**：MySQL 索引、事务、锁、优化等核心知识
+- **[MySQL 笔记](./MySQL/MySQLNotes.md)**：MySQL 索引、事务、锁、优化等核心知识
+
+### 计算机网络
+- **[计算机网络笔记](./ComputerNetwork/ComputerNetworkNotes.md)**：TCP/IP、HTTP、HTTPS、三次握手四次挥手等核心知识
 
 ## 🎯 学习建议
 
