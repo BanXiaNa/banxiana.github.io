@@ -975,7 +975,7 @@ Tinner 执行任务的是一个线程，源码中没有任何处理异常的操�
   - **LinkedBlockingQueue：**链表可选有界队列，创建的时候不指定大小就是无界的，维护两把锁：生产锁，消费锁，所以吞吐量更高
 
 - 锁相关：**StampedLock**、ReentrantReadWriteLock、StampedLock
-  - StampedLock：
+  - **StampedLock**：引入乐观锁来增加读并发
 
 
 ## 什么是 Java 的 StampedLock？
@@ -1099,23 +1099,174 @@ RecursiveAction：没有返回值，适合做扫描之类的操作
 
 优化操作，如果当前任务阻塞了，可以通过 ManagedBlocker 通知 ForkJoinPool 去创建一个新的线程去顶上，因为 ForkJoinPool 主要面向 CPU 密集型任务，IO 阻塞了影响性能，这个线程会在阻塞结束之后再回收，但是阻塞还是会影响性能
 
+## 如何在 Java 中控制多个线程的执行顺序？ 
 
+- 使用 .join() 方法，让主线程去等待任务的结束，然后再执行下面的线程
+- 使用 CountDownLatch 等并发工具类可以适配各种场景
+- CompletableFuture 的链式调用也可以实现线程之间的顺序执行，代码简洁，更加灵活
+- 使用单线程的线程池，任务执行顺序完全看提交顺序
 
+## 如果用 join() 控制 3 个线程顺序执行，其中一个线程抛异常了会怎样？
 
+join 的底层就是去拿到对象锁，然后去等待，并不关心具体执行，如果发生异常爆炸了，就不等了，直接执行，所以异常的情况需要自己处理
 
+## CountDownLatch 和 CyclicBarrier 都能让线程等待，它俩核心区别是啥？
 
+countDownLatch 适配的场景是两部分线程，一部分等待另一部分准备完成，再去工作，CyclicBarrier 适合一堆线程互相等待的场景
 
+还有个区别就是 CountDownLatch 不能复用，只能使用一次，CyclicBarrier 可以重复使用，适用于多轮多线程场景
 
+## CompletableFuture 链式调用中，前面的任务抛异常了，后面的 thenRun 还会执行吗？
 
+不会，异常会传播，CompletableFuture 提供了专门处理异常的方法， 使用这些方法可以处理异常，否则异常就会一直传递下去
 
+## 为什么说不能在 Thread 对象上随便调 notify？
 
+因为 Thread 会被其他的地方 wait，这个可能是隐形的，因为有些方法内部就是 wait 这个Thread 对象，比如 Join 方法就是依靠这个实现的，如果调用 notify 可能唤醒正在等待的线程，程序的顺序就乱掉了，所以最好别碰
 
+## 你使用过 Java 中的哪些阻塞队列？ 
 
+阻塞队列的本质就是存放都会被阻塞，存元素时会检测是否满了，如果满了就直接进行阻塞，直到空出位置，拿元素的时候如果没有元素，就进入阻塞，直到有元素加入队列，这种模式天然适合消费者 - 生产者模型
 
+- ArrayBlockingQueue：底层使用数组实现，创建时必须指定容量，后续不可更改，使用一个 ReentrantLock 控制并发，并发效率比较低
+- LinkedBlockingQueue：底层是链表，创建的时候如果不指定大小的话就是无界队列，不是很合适，使用两个锁分别维护头尾做并发保护，因为使用两个锁，所以生产和消费并不会相互阻塞，并发效率比较高，但是每个元素进入都得 new 一个 Node，GC 方面因为大量短命对象出现，表现并不好
+- PriorityBlockingQueue：无界队列，底层是堆，所以元素要实现 Comparable 或者传入 Comparator，用来支持优先出队
+- DelayQueue：延迟队列，元素必须实现 Delayed 接口，内部需要实现获取剩余时间的方法，如果到时间了就可以取出来，定时任务可以用
+- SynchronousQueue：没有容量的队列，也就是说 put 之后必须等待另外一个线程 take，有线程池也实现了这个，目的是任务直接提交线程，不进入队列
 
+除了会进行阻塞的 put 和 take 方法，还提供了快速失败的 offer 和 poll 方法，如果队列满了/空了，直接返回 false
 
+add()，remove 更狠，如果队列空了/满了直接去报错
 
+## 为什么说无界队列可能导致 OOM，有界队列就不会吗？
 
+无界队列之所以会 OOM，是因为生产的速度大于消费的速度，队列没有上限，生产者有了数据就直接 put 到队列中，队列无限膨胀，就会 OOM，有界队列会指定大小，生产者不会无限的投放数据，如果有界队列用于线程池，就要考虑任务提交失败的情况
+
+## LinkedBlockingQueue 两把锁具体是怎么实现的，不会出问题吗？
+
+LinkedBlockingQueue 在头结点和尾节点各自设立了一把锁，takeLock 和 putLock，take 操作只会加锁 TakeLock，put 操作只会加锁 PutLock，但是这对于一个队列来说仍然存在并发问题，因为存取元素的时候不只需要更改队列，还需要更改链表长度之类的元数据，LinkedBlockingQueue 使用 AtomicInteger 记录长度，避免并发问题
+
+## DelayQueue 底层是怎么实现延迟的，到期了怎么知道？
+
+DelayQueue 的元素必须实现 Delayed 接口，这个接口定义了一个方法，能够查看剩余的时间，DelayQueue 维护了一个线程，这个线程会拿到顶端的元素，如果这个时候时间没到，就 wait 指定的时间，醒过来再看看，所以任务并不是自己出来的，而是线程拉出来的
+
+## SynchronousQueue 没有容量，那多个生产者同时 put 会怎样？
+
+大家都等着，如果没有消费者在等待元素，生产者就会被阻塞，进入等待队列中，如果有消费者来拿数据，就会从等待队列中随便唤醒一个，配对交换数据
+
+## 你使用过 Java 中的哪些原子类？
+
+原子类是 JUC 中无锁化实现安全并发操作的工具，使用 CAS 操作代替加锁，在竞争不激烈的环境下，表现比加锁好
+
+- 原子基本类型：AtomicInteger、AtomicLong、AtomicBoolean，很明显，对应 int long bool 三种基本类型
+- 数组类型：AtomicIntegerArray、AtomicLongArray、AtomicReferenceArray：对数组里面的类型做原子操作
+- 引用类型：AtomicReference 对对象引用做原子更新；AtomicStampedReference 带版本号，解决 ABA 问题；AtomicMarkableReference 带布尔标记。
+- 字段（属性）更新器：AtomicIntegerFieldUpdater、AtomicLongFieldUpdater，通过反射原子更新对象的某个 volatile 字段，不用把整个对象换成原子类。
+- 累加器：LongAdder、DoubleAdder，专门为高并发累加优化的，比 AtomicLong 性能好很多。
+
+## AtomicLong 和 synchronized 加锁相比，性能差距有多大？
+
+低竞争时，AtomicLong 使用 CAS 来避免加解锁的开销，所以性能比 Synchronized 高，但是高竞争环境下，CAS 大概率失败，大量线程一直自旋，CPU 开销很大，性能反而不如 Synchronized
+
+## CAS 自旋会不会把 CPU 跑满？有什么办法缓解？
+
+会的，大家一起重试，CPU 就满了，一般的解决办法是使用 LongAdder 的方案，进行分段式分散临界资源，再就是失败太多次之后直接阻塞，再就是失败之后就随机休息一段时间，防止大量线程同时自旋，打爆 CPU
+
+## 为什么 LongAdder 的 sum() 方法不是原子的？
+
+LongAdder 使用分段式来削减 CAS 失败带来的影响，具体来说是他维护了 BaseCount 来计算值，还维护了 Cell 数据用来在竞争激烈的时候做备选，CAS 失败的线程会去 Cell 选个地方修改，因此，计算和的操作本质是计算 BaseCount 和 Cell 数组的和，不是原子的，甚至不是精确的，如果需要精确的值，就加锁计算，或者使用 AtomicLong
+
+## AtomicStampedReference 的版本号用 int 存，会溢出吗？
+
+会的，但是影响，因为版本号只是为了解决 ABA 问题，Int 溢出之后也只是变成负数，还是会保留变化，不会影响 CAS 的正确性
+
+## Synchronized 能不能禁止指令重排序？ 
+
+不能，Synchronized 保证的是同时只能有一个线程进入临界区执行代码，临界区的代码怎么执行的，是否重排，并不关心，这也是为什么单例模式虽然使用 Synchronized 加锁 new 操作但是还是需要双捡操作的原因
+
+Synchronized 只能在临界区前后加上屏障，保证读操作不跑到前面，写操作不跑到后面
+
+## 什么是 Java 中的指令重排？ 
+
+指令重排就是 CPU 和编译器为了优化执行的效率，将不依赖的指令调换顺序的操作，这个操作保证单线程运行下，结果不变，但是这个操作在多线程的情况下就不太可靠了
+
+- 编译器重排：编译器会在生成字节码的时候，将不相干的指令调整顺序，使寄存器分配更加高效
+- CPU 重排：现在的 CPU 都是乱序执行的，并行处理多条指令，没有依赖的两条指令会被并行执行，完成之后再按照原始顺序提交结果
+- 内存重排：CPU 有 store buffer 和 invalidate queue，写操作可能先进入 Store Buffer，然后再刷到缓存，读操作会从 invalidate queue 拿到没来得及刷缓存的数据，这个数据就是旧的，也就是内存的操作顺序和执行顺序不一样
+
+JVM 在遵守 as-if-serial 前提下进行指令的重排，对于多线程场景下，使用 volatile、synchronized 和 happens-before 规则来限制重排序，让开发能够更加方便的控制指令执行的顺序
+
+## 说说内存屏障？
+
+指令重排遵守 as-if-serial 原则进行性能方面的优化，但是在多线程下面就不好用了，所以我们使用内存屏障来限制指令重排
+
+内存屏障分为四种：
+
+|  屏障类型  |               作用               |    插入时机     |
+| :--------: | :------------------------------: | :-------------: |
+|  LoadLoad  | 禁止读操作重排到屏障后面的读之前 | volatile 读之后 |
+| LoadStore  | 禁止读操作重排到屏障后面的写之前 | volatile 读之后 |
+| StoreStore | 禁止写操作重排到屏障后面的写之前 | volatile 写之前 |
+| StoreLoad  | 禁止写操作重排到屏障后面的读之前 | volatile 写之后 |
+
+## 什么是 Java 的 happens-before 规则？ 
+
+现代不同的 CPU 架构很多，不同的架构对于指令重排的激进程度不同，如果开发者需要根据不同的架构去设计不同的程序以适应不同的排序方式带来的多线程的影响，那 一次编写，到处运行 就成了空话，JVM 提供了 happens-before 规则来适配不同的架构，开发者只需要关注 happens-before，其他的交给 JVM
+
+happens-before：JVM 定义的用于约束多线程环境下操作的可见性和顺序性，A happens-before B 表示 A 的操作一定对 B 可见，A 一定在 B 之前
+
+核心规则：
+
+- **程序顺序规则：**在一个线程之内，前面的操作 happens-before 后面的操作，很好理解，单线程下如果这都不能保证，程序就乱套了
+- **监视器锁规则：**一个锁的释放动作 happens-before 后续同一个锁的加锁动作，这个也好理解，否则临界区就乱套了
+- **volatile 规则：**对 volatile 变量的写操作 happens-before 对这个变量的读操作，保证可见性的必要性
+- **线程启动规则：**Thread.start() 调用 happens-before 被启动线程里的所有操作。这意味着一个线程被另一个线程启动之后，他能看到主线程做的任何操作
+- **线程终止规则：**线程里面的所有操作 happens-before 其他线程调用该线程的 join() 返回，这意味着如果一个线程返回之后，可以被等待他的线程看到所有结果
+- **线程中断规则：**interrupt() 调用 happens-before 被中断线程检测到中断事件，很简单，被中断触发的操作必须发生在中断之后
+- **对象终结规则：**对象的构造方法 happens-before finalize() 方法的开始。构造器里设置的字段值，finalize() 里一定能看到。
+- **传递性规则**：如果 A happens-before B，B happens-before C，那么 A happens-before C。这条规则让 happens-before 关系可以传递推导。
+
+## happens-before 规则里的"happens-before"是不是指时间上的先后？
+
+不是，A早于B并不意味着 A happens-before B 的，相同的，A happens-before B，也并不代表着 A 一定比 B 先执行，最终效果是这样的，但是执行顺序不一定了就
+
+## volatile 变量的写读一定比 synchronized 快吗？
+
+是的，因为 volume 只是去添加内存屏障，而不用去加锁，JVM 针对 Synchronized 做了很多优化，轻量锁在无竞争环境下也很快，如果是一个变量的标记，volume 是比较好的，如果是一组变量的话，Synchronized 比较好
+
+## 两个线程分别读写不同的 volatile 变量，它们之间有 happens-before 关系吗？
+
+没有的，volatile 只是针对一个变量可见性，如果两个变量先后读写一个变量，他们之间就有 happens-before 关系，如果不是一个的话，就没有关系了
+
+## 如果我只在构造函数里给 final 字段赋值，不加任何同步，其他线程一定能看到正确的值吗？
+
+在没有逸出的时候是这样的，但是逸出就说不准了，比如构造函数启动了另外一个线程，将 final 引用的字段给拉出去了，别的线程就可能看到这个 final 字段，final 保证可见性的底线是构造跑完了，如果在中途被跑出去，就可能被别的线程访问
+
+## 为什么 x86 架构上有些并发 bug 测不出来？
+
+因为 X86 号称强一致性，只允许 Store-Load 重排，其他的重排就被禁止了，这就意味着很多赖弱内存模型才暴露的 bug 不能被检测出来，直到在一些比较激进的架构上才会被查出来，所以最好直接遵守 happens-before 这样代码就可以到处跑了
+
+## volatile 的内存屏障开销大吗？实际项目中应该怎么用？
+
+volatile 插入的是 StoreLoad 屏障，这个是最大的屏障，直接刷新 soreBuffer，在高频写入场景下，频繁添加这个屏障开销不小，如果需要频繁写入一个变量并且要保证线程安全的话，可以用 AtomicLong 或者 LongAdder 使用 CAS 更好
+
+## new 对象的时候，JVM 是怎么保证对象在堆上正确初始化的？
+
+首先会在堆上面开辟一个空间，所有的字段都是默认值，然后再执行构造函数，这里会被重排，引用赋值可能发生在构造函数执行完毕，这个时候，别的线程可能拿到没有被初始化的对象，所以可以使用 volatile 禁止重排，synchronized 加锁，或者使用 final 字段来保证初始化的安全性
+
+## 你说双重检查锁不加 volatile 会有问题，那如果构造方法里没有任何操作，还会有问题吗？
+
+会的，初始化对象的逻辑不止构造函数，比如对象头，字段的默认值都需要指令去实现，而 JVM 不能保证其顺序性，这种指令仍然可能和引用赋值去调换顺序，所以不加就是不安全，和构造没关系
+
+## synchronized 块内部的指令重排会影响正确性吗？
+
+一般情况下不会，因为 Synchronized 的作用就是让一个线程去访问临界资源，如果只有一个线程在操作的话，即使发生重排，也不会影响最后的结果，但是如果有别的线程不加锁也能访问临界资源，那就没辙了，会访问到中间态的数据，导致数据不正确，程序的正确性不保证了
+
+## JDK 5 之前的双重检查锁为什么不能用？
+
+JDK 5 之前的 volume 只能保证可见性，而不能防止指令重排，双捡 + volume 的作用是防止 new 对象的过程中指令被重排导致别的线程访问到没有初始化完成的对象，如果不能防止指令重排的话，volume 在双捡中就没了意义
+
+## 当 Java 的 synchronized 升级到重量级锁后，所有线程都释放锁了，此时它还是重量级锁吗？ 
 
 
 
