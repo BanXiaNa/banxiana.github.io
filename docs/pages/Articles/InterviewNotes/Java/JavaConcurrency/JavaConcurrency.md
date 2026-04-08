@@ -1298,6 +1298,217 @@ JDK 15 之前使用 deflation 在 safepoint 中被执行，但这样会增加 sa
 
 主要的思路就是减小锁的范围，如果一个线程更够快速的通过一个锁，那么性能就会更高，可以只锁真正涉及线程安全的操作，或者可以使用无锁化编程，CAS 能解决的就不要使用锁，
 
+## 你了解 Java 中的读写锁吗？ 
+
+读写锁是一种特殊的锁，它允许不同的线程进行读操作的并行，因为读操作并不会涉及线程安全问题，相应的，写操作和写操作，写操作和读操作是互斥的，这种机制适合读多写少的场景
+
+- 读锁是共享锁，线程来了只需要标记一下自己加锁了，除非写锁正在被持有
+- 写锁是独占锁，线程等待读锁或者写锁小时，拿到写锁，其他的线程就获取不到写锁和读锁了
+
+ReentrantReadWriteLock 基于 AQS 实现了 ReadWriteLock 接口，使用一个 32 位的整数来进行锁的计算，这个整数的前 16 位记录读锁的持有数目，后 16 位记录写锁的重入次数，这意味着，读锁和写锁最多被获取/重入 65535 次，超过就报错了
+
+ReentrantReadWriteLock 支持锁降级，就是写锁过渡到读锁，这样可以减少一次尝试获取锁的机会，在写立刻读中有很大作用，但是没有增加读锁升级到写锁的机制，因为同时可能存在多个读锁，大家都想升级，而且不释放读锁，就死锁了
+
+ReentrantReadWriteLock 可以指定公平性，也就是是否先 CAS 一把
+
+StampedLock：作为 JDK 8 引入的乐观读写锁，不加锁读，读完检测写锁版本号，如果版本号更改就说明数据更改了，直接升级锁
+但是由于追求性能，设计上的简单高效使其不支持公平模式，不支持升级，不支持重入，但是也够用
+
+## 读写锁的写线程饥饿问题怎么解决？
+
+使用公平锁模式，公平锁让所有线程都去排队，每个线程都有机会得到锁，并不会饿死，但是频繁挂起与唤醒线程会造成极大的上下文压力，所以并不如非公平锁效率高
+
+## StampedLock 的乐观读为什么能提升性能？
+
+因为不用加锁，不用 CAS，读取数据前后直接比对一下写锁版本号就可以，如果版本号改变，就说明读到的数据没错，直接返回就行，没有竞争，在低竞争的环境下，确实快
+
+## 什么场景下不应该用读写锁？
+
+如果写操作和读操作一样频繁，甚至超过了读操作就没必要了，读写锁维护了两套锁，开销更大，使用 ReentrantLock 应对这种情况更好，另外，临界区的业务如果非常简单，使用锁的开销可能比业务的开销还大，这个时候使用 CAS 或者无锁的数据结构就可以
+
+## 什么是 Java 内存模型（JMM）？ 
+
+JMM 是 JVM 定义的一套规范，他规定了多线程中，变量应该如何在内存中使用和传递，规定了线程从内存中读取数据和向内存中写入数据的方式，用于屏蔽掉不同操作系统的差异，让 Java 能够在各大平台上运行
+
+核心目的就是用于维护多线程下 Java 运行的可见性，有序性和原子性
+
+JMM 模型：
+
+- JMM 维护两种区域：主内存，每个线程的内存。
+- 主内存放共享变量，每个线程的内存存放变量的副本
+- 线程操作变量必须通过自己的副本内存进行
+- 线程之间的信息交换必须通过主内存进行
+
+JMM 的出现使我们只需要使用 Java 提供的并发类 和 happens-before 原则就能写出并发安全的代码，
+
+## volatile 能保证可见性，那为什么还需要 synchronized？
+
+volatile 只能保证单个变量的可见性，而当我们需要保证原子性，有序性或者多个变量的可见性的时候，volume 就不顶用了，简单的操作使用 volume 够了，效率还高，但是复杂的操作需要使用 Synchronized 才可以
+
+## 指令重排序在什么情况下会导致问题？
+
+比如单例模式的懒汉创建对象操作，一个 new 操作分为三部分：分配内存，初始化对象，更新引用，如果 2,3 重排了，就会导致一个空对象传出去，其他线程拿到就会报错，这就是防止指令重排的意义
+
+## 本地内存是真实存在的吗？
+
+并不是，实际上这玩意对应的是 寄存器，三层缓存那些，JMM 通过定义这些架构，将开发者和 CPU 架构隔离开来，只需要遵守 happens-before 规则就能写出正确的并发代码。
+
+## 什么是 Java 中的原子性、可见性和有序性？ 
+
+- 原子性：用来描述操作的，一个操作或者一组操作要么成功，要么失败，不能做一半就结束，
+- 可见性：CPU 架构都有缓存，有时候指令执行完毕之后，数据还在缓存中，其他的核读取不到最新的数据了就，可见性就是保证每次操作之后都将最新的数据刷新到大缓存中。
+- 有序性：主要指代码的执行顺序和书写顺序一致，防止多线程环境下由于编译器和CPU和内存的指令重拍带来一系列诡异的 BUG
+
+## volatile 能保证原子性吗？为什么 volatile int count 的 count++ 不是线程安全的？
+
+不能，volatile 只能保证可见性和禁止重排序，不能保证原子性，++ 操作分为三部分，读取，加一，写回，不能保证原子性当然不能说是线程安全的
+
+## 为什么双重检查锁定的单例需要加 volatile，不加会出什么问题？
+
+new 对象的过程分为三部分，申请内存，初始化对象，更改引用，在允许重排的情况下，引用被先一步更改，如果这个时候别的线程通过这个引用访问了一个空的对象，就会报错。所以要加上防止指令重排带来的问题
+
+## Java 中的 final 关键字是否能保证变量的可见性？ 
+
+不能，可见性通过强制刷新缓存来实现的，final 显然不具有这种功能，final 保证的是修饰的字段肯定会在构造方法完成之后才被读取（如果构造函数将 final 字段逸出，那就不能保证了）
+
+final 通过内存屏障实现这种功能，首次写 final 的时候添加 StoreStore，读的时候添加 LoadLoad 屏障
+
+刚才说了逸出问题，如果提前将 final 对象的引用给别人了。就直接给别的线程暴露出去了，如果还没完成创建，就可能拿到未初始化的值
+
+## volatile 的内存屏障和 final 的有什么不一样？
+
+final 在读的时候会插入LoadLoad  屏障，在写的时候插入 StoreStore，而 volume 在写的时候会插入 StoreStore + StoreLoad 屏障，在读的时候插入 LoadLoad + LoadStore 屏障，开销大得多，所以能使用 final 就不使用 volume
+
+## String 是不可变的，内部 char 数组也是 final 的，那如果我通过反射改了这个数组，其他线程能看到吗？
+
+不一定，JVM 只针对正常的 final 写操作进行插入内存屏障的操作，通过反射来进行的写操作并不能插入内存屏障，这个时候其他的线程看没看到就全看 CPU 缓存了，不建议给自己埋雷
+
+## 构造函数里如果给 final 字段赋值两次，会发生什么？
+
+不能通过编译，final 字段只允许写入一次，要么声明赋值，要么构造赋值
+
+## 为什么在 Java 中需要使用 ThreadLocal？ 
+
+ThreadLocal 让每个线程持有一份数据，互相不干扰，相对于 synchronized、Lock，其采用不同的方式实现资源的获取，从原来的竞争关系改为使用自己的数据，没有加解锁，没有等待，没有上下文切换，性能自然上去了
+
+每一个 Thread 对象内部维护一个 Map，类型是 ThreadLocalMap，key 就是 ThreadLocal，值可以是任何东西，也就是说，在一个线程中，Map 中的资源可以在任何时候被访问，一些通用的信息可以存储在里面，方便直接调用，不用来回传来传去
+
+另外，ThreadLocaMap 中，Entity 继承了 WeakReference，key 是弱引用，这意味着在外部对 ThreadLocal 的强引用消失的时候，ThreadLocal 会被回收掉，Value 就成了泄露的数据，虽然 ThreadLocaMap 会在 get、set 的时候顺手清理掉一些 key 为 null 的值，但是毕竟不是长久之计，还是用完之后就 remove 比较好
+
+另外，ThreadLocal 有个问题，就是子线程拿不到父线程的值，因为每个 ThreadLocalMap 都是独立的，可以使用 InheritableThreadLocal 来进行传递，子线程在创建的时候会拷贝一份父线程的值，问题又来了，这玩意不能在线程池中使用，因为他只是创建的时候拷贝一份，线程池的线程都是复用的，TransmittableThreadLocal 解决了这个问题，在每次任务被提交的时候就拿到父线程的值
+
+## 你刚才提到 ThreadLocal 会有内存泄漏，那为什么 Entry 的 key 要设计成弱引用，直接用强引用不行吗？
+
+使用强引用，只要 ThreadLocalMap 还在，这个 Entry 就不会消失，如果设计成弱引用，key 会被 GC 回收，Value 也会被异步清理，虽然还是会发生泄露，但是好很多了，最好的方法还是及时 remove
+
+## 线程池场景下用 ThreadLocal 要注意什么？
+
+由于线程池的线程是复用的，ThreadLocalMap 中的值也会流到下一个任务中，下一个任务可能读取到的数据是上一个任务的，就可能错误，因此，在一个任务结束之后，一定要清理掉 ThreadLocalMap 中的所有值，另外 InheritableThreadLocal 在线程池里基本废了，因为值是创建线程时拷贝的，复用的线程不会重新拷贝。使用阿里的 TransmittableThreadLocal 可以避免这一个问题
+
+## ThreadLocal 的哈希冲突是怎么解决的？
+
+ThreadLocal 使用的是 ThreadLocalMap，会发生哈希碰撞，因为一个 ThreadLocalMap 并不会存储太多值，其采用的处理策略是线性探测法，递增一个固定值：0x61c88647，这个数字是斐波那契的魔数，能够让哈希分布更加均匀，
+
+## Java 中使用 ThreadLocal 的最佳实践是什么？
+
+如果线程是池化的，对 ThreadLocalMap 的清理工作就很重要了，尽量使用 try-catch 来进行清理，防止下一个任务拿到上一个任务的数据，比如 Tomcat 的线程就是复用的
+
+使用 static final 做多次任务的 ThreadLocal 的声明，没必要每一次就 new 一个，这样虽然放弃了弱引用带来的 CG 回收，但是可以强制用 remove 来清理数据
+
+尽量少用，能传递就传递值，因为这玩意本质是隐形的，代码检查 bug 不好找
+
+## Spring 的 RequestContextHolder 是怎么保证请求结束后清理的？
+
+Spring 在 FrameworkServlet 的 processRequest 方法里做了统一处理，用 try-finally 包住整个流程，finally 里调用 resetContextHolders 清理 RequestContextHolder 和 LocaleContextHolder。也就是说，无论发生了什么，都保证内存不会泄露
+
+## 如果 ThreadLocal 存的是大对象，有什么需要注意的？
+
+ThreadLocal 存放大对象一般是要存放很多个这样的对象，针对这种大对象的频繁创建和销毁，开销是很恐怖的，可以使用对象池管理这些大对象，ThreadLocal 只存储对应对象的引用，还要做好监控，ThreadLocalMap 大了就报警
+
+## 为什么推荐把 ThreadLocal 声明成 static 的？
+
+如果不设置成静态的话，每一次线程来都得创建一个，开销很大，这玩意只做一个 Key 使用，没必要使用这么大的开销，另外，设置成静态的，防止 GC 销毁，就得手动写 remove 了，也算是防御性编程
+
+## 为什么 Netty 不使用 ThreadLocal 而是自定义了一个 FastThreadLocal ？ 
+
+Netty 中大量使用 ThreadLocal，因此，ThreadLocal 的性能瓶颈成为了制约 Netty 的瓶颈，主要有两点：ThreadLocalMap 的 reHash 开销和弱引用 key 带来的内存泄漏风险
+
+针对内存冲突，Netty 在创建 FastThreadLocal 的时候给每个 FastThreadLocal 分配了不同的值，直接用这个 index 作为下标，不会发生冲突，要改 ThreadLocalMap 就得动 Thread，但 JDK 的 Thread 改不了，所以 Netty 配套搞了三个类：FastThreadLocal 对标 ThreadLocal，InternalThreadLocalMap 对标 ThreadLocalMap，FastThreadLocalThread 对标 Thread。三者配合使用才能发挥最大性能。
+
+代价就是空间，如果 new 了好几个 FastThreadLocal，数据就得开这么大，但是有的线程又用不了这么多，就会浪费
+
+## FastThreadLocal 比 ThreadLocal 快多少？有没有具体的性能数据？
+
+官网说快 3 - 5 倍左右，但是 ThreadLocal 本身就够快了，只是 Netty 用的很多，才有优化的必要
+
+## FastThreadLocal 的空间浪费问题在实际使用中严重吗？
+
+Netty 中不严重，因为 Netty 只有EventLoop 线程数量固定且每个线程用到的 FastThreadLocal 基本一致，所以浪费不大。
+
+实际项目中使用 FastThreadLocal 顶天十几个，不会造成很大的浪费的
+
+## 如果不用 DefaultThreadFactory，怎么保证 FastThreadLocal 不泄漏？
+
+每次用完之后记得 remove 就是好习惯，或者嫌麻烦直接 FastThreadLocal.removeAll() 直接清理这个线程所有的 FastThreadLocal。
+
+## Java 中的 wait、notify 和 notifyAll 方法有什么作用？ 
+
+wait、notify 和 notifyAll 被定义在 Object 中，需要配合 synchronized 用于获取对象头锁使用，
+
+- wait：用于让当前线程进入等待状态，同时释放锁，直到被唤醒或者超时
+- notify：唤醒等待队列的一个线程，在 HotSpot 实现中是按 FIFO 顺序唤醒。
+- botifyAll：唤醒队列中的所有线程，让他们去竞争锁
+
+## 调用 wait 之后线程还能响应中断吗？
+
+能，调用后线程会报错并且清除掉标志位，所以一般来说调用之后要么处理报错要么重置标志位
+
+## 如果不在 synchronized 块里调用 wait 会怎样？
+
+直接报错，因为 wait 会释放锁，如果没锁就不能释放。JVM 会检查当前线程是否持有对象的 Monitor，没有的话就报错
+
+## 在 Java 中主线程如何知晓创建的子线程是否执行成功？ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
