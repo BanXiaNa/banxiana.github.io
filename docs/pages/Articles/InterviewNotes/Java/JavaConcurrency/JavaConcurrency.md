@@ -1469,6 +1469,99 @@ wait、notify 和 notifyAll 被定义在 Object 中，需要配合 synchronized 
 
 ## 在 Java 中主线程如何知晓创建的子线程是否执行成功？ 
 
+是否执行成功主要靠拿到子线程的结果，看看是正常的结果还是报错，主要方法：
+
+- Thread.join()，主线程等待子线程执行完毕，如果发生异常可以通过子线程自己去通过异常处理来更改共享变量通知主线程
+- Callable + Future，使用 Callable 创建任务，Future 拿到任务的结果，如果结果正常就说明执行成功，如果报错就说明任务执行失败
+- 回调机制：主线程传递一个回调函数来让子线程执行，不需要阻塞，适合异步场景
+- CountDownLatch：这玩意天生适合让一个线程等待另一个线程，缺点是只能用一次而且不能知道成功还是失败
+
+ CompletableFuture 更是重量级，可以异步处理线程的结果，还能聚合处理多个任务的结果，适合现代化的代码
+
+## Future.get() 会一直阻塞吗？如果子线程死循环了怎么办？
+
+会的，所以一般使用它的重载版本，这样超时了就不等了，直接报错，然后可以尝试中断任务，但是如果线程是死循环而且又没有中断检测，那就没辙了
+
+## join() 和 CountDownLatch 都能等线程结束，有什么区别？
+
+join 只能等待一个线程，而 CountDownLatch 允许多个线程等待多个线程，而且，这个等待不一定是线程任务执行完毕，也能是线程任务的某个阶段就能触发，更加灵活，而且，join 必须持有对这个线程的引用，对于线程池来说，拿不到 Thread 就没办法等待，而 CountDownLatch 只需要持有对 CountDownLatch 的引用就可以了
+
+## CompletableFuture 的 thenApply 和 thenApplyAsync 有什么区别？
+
+主要是针对后续任务的分配问题，thenApply 会将后续任务丢给当前线程执行，thenApplyAsync 会将这个任务重新丢给线程池，然后由线程池选择谁执行，也就是说，如果回调重的话，使用后者可以防止阻塞当前线程
+
+## Java 创建线程池有哪些方式？
+
+- ThreadPoolExecutor 手动创建：直接 new ThreadPoolExecutor，7 个参数全部自己指定。这是阿里巴巴开发规范推荐的方式，因为你清楚地知道线程池的每个配置，出了问题好排查。
+
+- Executors 工厂类：一行代码搞定，比如 newFixedThreadPool、newCachedThreadPool。看着方便，但生产环境不推荐用，因为默认配置容易踩坑，比如无界队列之类的问题
+- -ForkJoinPool：专门用来跑可以拆分的并行任务，内部用工作窃取算法，适合 CPU 密集型的递归计算场景。
+
+## 线程池的核心线程能被回收吗？
+
+一般不可以，核心线程作为线程池中的常驻线程，并不会被回收，但是可以通过 allowCoreThreadTimeOut(true)，来让核心线程也会在最大空闲时间之后被回收，这样做其实并不好，线程的频繁创建和回收会造成大量的性能开销，还不如挂着呢
+
+## 工作队列选 LinkedBlockingQueue 还是 ArrayBlockingQueue？
+
+LinkedBlockingQueue 底层是链表，用两把锁维护两端，并发友好，ArrayBlackingQueue 底层是数组，出入用一把锁，但是内存连续，CPU 缓存友好，差距不大，重点是要指定容量，不使用无界队列，小心 OOM，
+
+## 如果我想给线程池里的线程起个有意义的名字，怎么做？
+
+传入自定义的 ThreadFactory。可以用 Guava 的 ThreadFactoryBuilder，一行代码搞定：new ThreadFactoryBuilder().setNameFormat("order-pool-%d").build()。线程名带业务含义，出问题看线程堆栈一眼就能定位是哪个线程池。
+
+## submit 和 execute 有什么区别？
+
+提交方式的区别，execute 只能提交 Runnable，也就是说，并不会有返回值出现，异常直接爆出来，submit 可以提交 Runnable 和 Callable，返回 Future 对象，可以拿到结果或者报错，缺点就是异常不会主动跑出来，而是会被封装到 Future 中，如果报错了，忘了处理，异常就会被吞掉，这在开发中是不会被允许的
+
+## Java 线程安全的集合有哪些? 
+
+主要分为两大阵营，早期的同步集合和 JUC 提供的并发集合
+
+早期的集合主要是 Vector 和 Hashtable，这两个的同步方式就是给所有的方法加了个锁，锁的力度大，并发效率低，没人用了
+
+JUC 在 Java 5 被引入，针对高并发场景做了优化
+
+- ConcurrentHashMap 是用得最多的，JDK 8 之后用 CAS + synchronized 实现，粒度细到每个桶，几十个线程同时读写也不怕。像本地缓存、计数器这种场景特别适合。
+- CopyOnWriteArrayList 和 CopyOnWriteArraySet 走的是"写时复制"路线，写的时候复制一份新数组，读的时候完全不加锁。Spring 的事件监听器列表就是这么实现的，因为监听器注册一次之后很少改动，但每次事件触发都要遍历。
+- BlockingQueue 系列专门给生产者-消费者模型设计的，队列空了消费者自动阻塞，满了生产者自动阻塞，线程池的任务队列就是这玩意。常用的有 LinkedBlockingQueue、ArrayBlockingQueue、PriorityBlockingQueue。
+- ConcurrentSkipListMap 和 ConcurrentSkipListSet 是有序的并发集合，底层用跳表实现，查找是 O(log n)，不需要像 TreeMap 那样加锁整棵树。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
