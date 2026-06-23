@@ -1,0 +1,3 @@
+[submodule "docs/public/games"]
+	path = docs/public/games
+	url = https://github.com/BanXiaNa/PinelliaGame.git

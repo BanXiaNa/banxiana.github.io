@@ -73,7 +73,8 @@ export default defineConfig({
         text: '🗞 杂货',
         items: [
           { text: '🐍 Python 基础教程', link: '/pages/Groceries/MAGAOPythonNotesS1' },
-          { text: '⚡ C++ 算法模板', link: '/pages/Groceries/CppTemplate' }
+          { text: '⚡ C++ 算法模板', link: '/pages/Groceries/CppTemplate' },
+          { text: '🎮 小游戏', link: '/games/GameMain/index.html' }
         ]
       },
       { text: '🎵 音乐站', link: '/pages/Music/' }
