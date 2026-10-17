@@ -74,6 +74,7 @@ export default defineConfig({
         items: [
           { text: '🐍 Python 基础教程', link: '/pages/Groceries/MAGAOPythonNotesS1' },
           { text: '⚡ C++ 算法模板', link: '/pages/Groceries/CppTemplate' },
+          { text: '📘 C++ 笔记', link: '/pages/Groceries/CppNotes' },
           { text: '🎮 小游戏', link: '/games/GameMain/index.html' }
         ]
       },
@@ -252,7 +253,8 @@ export default defineConfig({
         text: '🗞 杂货',
         items: [
           { text: 'Python 基础教程', link: '/pages/Groceries/MAGAOPythonNotesS1' },
-          { text: 'C++ 算法模板', link: '/pages/Groceries/CppTemplate' }
+          { text: 'C++ 算法模板', link: '/pages/Groceries/CppTemplate' },
+          { text: 'C++ 笔记', link: '/pages/Groceries/CppNotes' }
         ]
       }
     ],
